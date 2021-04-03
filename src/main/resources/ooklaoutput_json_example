@@ -1,0 +1,40 @@
+{
+  "download": {
+    "bandwidth": 31842214,
+    "bytes": 291688576,
+    "elapsed": 9314
+  },
+  "interface": {
+    "externalIp": "84.105.4.111",
+    "internalIp": "192.168.178.59",
+    "isVpn": false,
+    "macAddr": "DC:A6:32:64:11:D2",
+    "name": "eth0"
+  },
+  "isp": "Ziggo",
+  "packetLoss": 0,
+  "ping": {
+    "jitter": 1.129,
+    "latency": 9.646
+  },
+  "result": {
+    "id": "d0577651-7949-4c4c-8dac-3765ba89f20c",
+    "url": "https://www.speedtest.net/result/c/d0577651-7949-4c4c-8dac-3765ba89f20c"
+  },
+  "server": {
+    "country": "Netherlands",
+    "host": "speedtest.claranet.nl",
+    "id": 30847,
+    "ip": "212.61.188.174",
+    "location": "Amsterdam",
+    "name": "Claranet Benelux B.V.",
+    "port": 8080
+  },
+  "timestamp": "2021-03-25T19:58:14Z",
+  "type": "result",
+  "upload": {
+    "bandwidth": 3200280,
+    "bytes": 13167616,
+    "elapsed": 4112
+  }
+}

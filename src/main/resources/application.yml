@@ -1,0 +1,31 @@
+spring:
+  application.name: commandline-data
+  datasource:
+    url: jdbc:postgresql://192.168.178.59:5432/cmdtst?currentSchema=cmddata
+    username: cmdtst
+    password: cmdtst!1234
+
+  flyway:
+    enabled: true
+    table: ms_changelog
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+
+---
+spring:
+  config.activate.on-profile: prod
+  datasource:
+    url: jdbc:postgresql://192.168.178.59:5432/cmdpro?currentSchema=cmddata
+    username: cmdpro
+    password: cmdpro!1234
+
+schedule:
+#  runspeedtest:
+#    cron: 0 * * * * ?
+  runping:
+    cron: 0 * * * * ?
+
+
+#cmdpro - cmdpro!1234
+#cmdtst - cmdtst!1234
