@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.ms</groupId>
     <artifactId>raspberry</artifactId>
-    <version>0.91</version>
+    <version>0.92</version>
     <name>raspberry</name>
     <description>Raspberry-pi project from martin</description>
     <properties>
