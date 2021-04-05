@@ -18,7 +18,7 @@ public interface PingQueryRepository extends CrudRepository<PingSummary, LocalDa
                     "from cmddata.ping " +
                     "group by 1 ";
 
-    @Query(value = DAY_SUMMARY, nativeQuery = true)
+    @Query(value = DAY_SUMMARY + " order by date_trunc('day', run_date_time) desc", nativeQuery = true)
     Collection<PingSummary> getDaySummary();
 
     @Query(value = DAY_SUMMARY + "having date_trunc('day', run_date_time) = :day ", nativeQuery = true)
