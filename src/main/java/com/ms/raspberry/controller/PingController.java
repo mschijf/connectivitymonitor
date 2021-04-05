@@ -1,7 +1,9 @@
 package com.ms.raspberry.controller;
 
 import com.ms.raspberry.entity.PingData;
+import com.ms.raspberry.entity.PingSummary;
 import com.ms.raspberry.service.PingService;
+import com.ms.raspberry.tools.DateTools;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -10,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.Collection;
 import java.util.Optional;
 
 
@@ -41,5 +46,11 @@ public class PingController {
         return data.isPresent() ? ResponseEntity.ok(data.get()) : ResponseEntity.notFound().build();
     }
 
-
+    @GetMapping("/ping/summary/{date}")
+    @ApiOperation(value = "Summary for the day", notes = "Summary of all pings for a certain day. Day in date format")
+    public ResponseEntity<Collection<PingSummary>> getPingDaySumamry(@RequestParam(name="date", required=false) String strDate) {
+        LocalDate date = DateTools.stringToDate(strDate);
+        Collection<PingSummary> data = pingService.getPingSummary(date);
+        return !data.isEmpty() ? ResponseEntity.ok(data) : ResponseEntity.notFound().build();
+    }
 }
