@@ -15,9 +15,9 @@ class ChartTest {
         ArrayList<String> labels = new ArrayList(Arrays.asList("l1", "l2", "l3"));
         ArrayList<Integer> data = new ArrayList(Arrays.asList(1,2,3));
         chart = Chart.newBuilder()
-                .setIdentifier("piechart")
                 .setLabels(labels)
-                .setData(data)
+                .setDataSet("set1", "#aabbcc", data)
+                .setDataSet("set2", "#xxyyzz", data)
                 .build();
     }
 

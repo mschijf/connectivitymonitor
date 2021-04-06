@@ -32,9 +32,7 @@ public class HtmlPageService {
                     "        </tr>\n" +
                     "    </tbody>\n" +
                     "</table>\n" +
-                    "<script>\n" +
                     "%s" +
-                    "</script>\n" +
                     "</body>\n" +
                     "\n" +
                     "</html>";
@@ -45,18 +43,22 @@ public class HtmlPageService {
     public String getPage() {
 
         Collection<PingSummary> summary = pingService.getPingSummary();
-        ArrayList<Integer>data = summary.stream()
-                .map(s->s.getMaxTimeMillis())
+        ArrayList<Integer>transmitted = summary.stream()
+                .map(s->s.getTotalPacketsTransmitted())
+                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Integer>received = summary.stream()
+                .map(s->s.getTotalPacketsReceived())
                 .collect(Collectors.toCollection(ArrayList::new));
         ArrayList<String> labels = summary.stream()
                 .map(s->s.getFromDate().toString())
                 .collect(Collectors.toCollection(ArrayList::new));
 
         Chart chart = Chart.newBuilder()
-                .setIdentifier("graphMaxTime")
                 .setLabels(labels)
-                .setData(data)
+                .setDataSet("Transmitted", "#3e95cd", transmitted)
+                .setDataSet("Received", "#0000ff", received)
                 .build();
+
         return String.format(pageTemplate,
                 chart.getHtml(),
                 chart.getJs());
