@@ -22,7 +22,7 @@ public class Chart {
     private static final String jsChartTemplate =
             "<script>\n" +
             "new Chart(document.getElementById(\"%s\"), {\n" +
-            "    type: 'bar',\n" +
+            "    type: '%s',\n" +
             "    data: {\n" +
             "      labels: [%s],\n" +
             "      datasets: [%s]\n" +
@@ -56,16 +56,26 @@ public class Chart {
         return "<canvas id=\"" + identifier + "\" width=\"800\" height=\"450\"></canvas>\n";
     }
 
-    public String getJs() {
+    public String getBarChartJs() {
+        String s = String.format(jsChartTemplate,
+                identifier, "bar",
+                listToString(labels),
+                getAllDataSets(allData, true),
+                35);
+        return s;
+    }
+
+    public String getLineChartJs() {
         return String.format(jsChartTemplate,
-                identifier, listToString(labels),
-                getAllDataSets( allData),
+                identifier, "line",
+                listToString(labels),
+                getAllDataSets(allData, false),
                 35);
     }
 
-    private String getAllDataSets(ArrayList<ChartDataSet> allData) {
+    private String getAllDataSets(ArrayList<ChartDataSet> allData, boolean fill) {
         return allData.stream()
-                .map(item->getDataSet(item.getLabel(), item.getColor(), item.getList(), true))
+                .map(item->getDataSet(item.getLabel(), item.getColor(), item.getList(), fill))
                 .collect(Collectors.joining(","));
     }
 

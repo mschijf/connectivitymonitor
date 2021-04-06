@@ -28,10 +28,11 @@ public class HtmlPageService {
                     "    <tbody>\n" +
                     "        <tr>\n" +
                     "            <td>%s</td>\n" +
-                    "            <td>Ruimte voor tweede grafiek</td>\n" +
+                    "            <td>%s</td>\n" +
                     "        </tr>\n" +
                     "    </tbody>\n" +
                     "</table>\n" +
+                    "%s" +
                     "%s" +
                     "</body>\n" +
                     "\n" +
@@ -49,6 +50,15 @@ public class HtmlPageService {
         ArrayList<Integer>received = summary.stream()
                 .map(s->s.getTotalPacketsReceived())
                 .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Integer>min = summary.stream()
+                .map(s->s.getMinTimeMillis())
+                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Integer>avg = summary.stream()
+                .map(s->s.getAvgTimeMillis())
+                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Integer>max = summary.stream()
+                .map(s->s.getMaxTimeMillis())
+                .collect(Collectors.toCollection(ArrayList::new));
         ArrayList<String> labels = summary.stream()
                 .map(s->s.getFromDate().toString())
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -59,9 +69,19 @@ public class HtmlPageService {
                 .setDataSet("Received", "#0000ff", received)
                 .build();
 
+        Chart chart2 = Chart.newBuilder()
+                .setLabels(labels)
+                .setDataSet("Min time (ms)", "#00ff00", min)
+                .setDataSet("Avg time (ms)", "#ff0000", avg)
+                .setDataSet("Max time (ms)", "#ff0000", max)
+                .build();
+
         return String.format(pageTemplate,
                 chart.getHtml(),
-                chart.getJs());
+                chart2.getHtml(),
+                chart.getBarChartJs(),
+                chart2.getLineChartJs()
+                );
     }
 
 }

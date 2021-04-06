@@ -24,7 +24,7 @@ class ChartTest {
     @Test
     public void testJs() {
         System.out.println(chart.getHtml());
-        System.out.println(chart.getJs());
+        System.out.println(chart.getBarChartJs());
     }
 
 }
