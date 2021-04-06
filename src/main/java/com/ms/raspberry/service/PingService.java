@@ -53,5 +53,8 @@ public class PingService {
     public Collection<PingSummary> getPingSummary(LocalDate day) {
         return day != null ? pingQueryRepository.getDaySummary(day) : pingQueryRepository.getDaySummary();
     }
+    public Collection<PingSummary> getPingSummary() {
+        return getPingSummary(null);
+    }
 }
 
