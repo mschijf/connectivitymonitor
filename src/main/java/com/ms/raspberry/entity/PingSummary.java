@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 public class PingSummary {
     @Id
-    @Column(name = "date_time_hour")
+    @Column(name = "date_time")
     private LocalDateTime fromDate;
     @Column(name = "total_transmitted")
     private int totalPacketsTransmitted;

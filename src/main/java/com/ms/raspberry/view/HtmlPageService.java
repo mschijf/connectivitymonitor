@@ -30,9 +30,13 @@ public class HtmlPageService {
                     "        <tr>\n" +
                     "            <td>%s</td>\n" +
                     "            <td>%s</td>\n" +
+                    "        <tr>\n" +
+                    "            <td>%s</td>\n" +
+                    "            <td></td>\n" +
                     "        </tr>\n" +
                     "    </tbody>\n" +
                     "</table>\n" +
+                    "%s" +
                     "%s" +
                     "%s" +
                     "</body>\n" +
@@ -46,6 +50,7 @@ public class HtmlPageService {
 
         Collection<PingSummary> summaryDay = pingService.getPingDaySummary();
         Collection<PingSummary> summaryHour = pingService.getPingHourSummary();
+        Collection<PingSummary> summaryMinute = pingService.getPingMinuteSummary();
 
         Chart chart = Chart.newBuilder()
                 .setType(Chart.Type.BAR)
@@ -62,11 +67,21 @@ public class HtmlPageService {
                 .addDataSet("Max time (ms)", "#ff0000", getMaxTime(summaryHour))
                 .build();
 
+        Chart chart3 = Chart.newBuilder()
+                .setType(Chart.Type.LINE)
+                .setLabels(getRunTime(summaryMinute))
+                .addDataSet("Min time (ms)", "#00ff00", getMinTime(summaryMinute))
+                .addDataSet("Avg time (ms)", "#0000ff", getAvgTime(summaryMinute))
+                .addDataSet("Max time (ms)", "#ff0000", getMaxTime(summaryMinute))
+                .build();
+
         return String.format(pageTemplate,
                 chart.getHtml(),
                 chart2.getHtml(),
+                chart3.getHtml(),
                 chart.getJs(),
-                chart2.getJs()
+                chart2.getJs(),
+                chart3.getJs()
                 );
     }
 

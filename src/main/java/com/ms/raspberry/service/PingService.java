@@ -50,14 +50,14 @@ public class PingService {
         doPing();
     }
 
-    public Collection<PingSummary> getPingHourSummary(LocalDate day) {
-        return day != null ? pingQueryRepository.getHourSummary(day) : pingQueryRepository.getHourSummary();
-    }
-    public Collection<PingSummary> getPingHourSummary() {
-        return getPingHourSummary(null);
-    }
     public Collection<PingSummary> getPingDaySummary() {
         return pingQueryRepository.getDaySummary();
+    }
+    public Collection<PingSummary> getPingHourSummary() {
+        return pingQueryRepository.getHourSummary();
+    }
+    public Collection<PingSummary> getPingMinuteSummary() {
+        return pingQueryRepository.getMinuteSummary();
     }
 
 }
