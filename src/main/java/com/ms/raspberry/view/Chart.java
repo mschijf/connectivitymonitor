@@ -7,17 +7,31 @@ import java.util.stream.Collectors;
 
 public class Chart {
 
+    public enum Type{BAR, LINE};
+
     private final String identifier;
     private final ArrayList<String> labels;
     private final ArrayList<ChartDataSet> allData;
+    private Type type;
 
-    private static final String dataSetTemplate =
+    private static final String htmlTemplate = "<canvas id=\"%s\" width=\"600\" height=\"350\"></canvas>\n";
+
+    private static final String barChartDataSetTemplate =
             "{\n" +
-            "   label: \"%s\",\n" +
-            "   backgroundColor: [%s],\n" +
-            "   data: [%s], \n" +
-            "   fill: %s" +
-            "}\n";
+                    "   label: \"%s\",\n" +
+                    "   backgroundColor: [%s],\n" +
+                    "   data: [%s], \n" +
+                    "   fill: %s" +
+                    "}\n";
+
+    private static final String lineChartDataSetTemplate =
+            "{\n" +
+                    "   label: \"%s\",\n" +
+                    "   borderColor: \"%s\",\n" +
+                    "   data: [%s], \n" +
+                    "   fill: %s" +
+                    "}\n";
+
 
     private static final String jsChartTemplate =
             "<script>\n" +
@@ -42,7 +56,8 @@ public class Chart {
 
 
 
-    public Chart(ArrayList<String> labels, ArrayList<ChartDataSet> allData) {
+    public Chart(Type type, ArrayList<String> labels, ArrayList<ChartDataSet> allData) {
+        this.type = type != null ? type : Type.BAR;
         this.identifier = generateUniqueIdentifier();
         this.labels = labels;
         this.allData = allData;
@@ -53,38 +68,37 @@ public class Chart {
     }
 
     public String getHtml() {
-        return "<canvas id=\"" + identifier + "\" width=\"800\" height=\"450\"></canvas>\n";
+        return String.format(htmlTemplate, identifier);
     }
 
-    public String getBarChartJs() {
-        String s = String.format(jsChartTemplate,
-                identifier, "bar",
-                listToString(labels),
-                getAllDataSets(allData, true),
-                35);
-        return s;
-    }
-
-    public String getLineChartJs() {
+    public String getJs() {
         return String.format(jsChartTemplate,
-                identifier, "line",
+                identifier, type.toString().toLowerCase(),
                 listToString(labels),
-                getAllDataSets(allData, false),
+                getAllDataSets(allData),
                 35);
     }
 
-    private String getAllDataSets(ArrayList<ChartDataSet> allData, boolean fill) {
+    private String getAllDataSets(ArrayList<ChartDataSet> allData) {
         return allData.stream()
-                .map(item->getDataSet(item.getLabel(), item.getColor(), item.getList(), fill))
+                .map(item->getDataSet(item.getLabel(), item.getColor(), item.getList()))
                 .collect(Collectors.joining(","));
     }
 
-    private String getDataSet(String label, String color, List<Integer> data, boolean fill) {
-        return String.format(dataSetTemplate,
-                label,
-                getColorList(data.size(), color),
-                numericalListToString(data),
-                Boolean.toString(fill));
+    private String getDataSet(String label, String color, List<Integer> data) {
+        if (type == Type.BAR) {
+            return String.format(barChartDataSetTemplate,
+                    label,
+                    getColorList(data.size(), color),
+                    numericalListToString(data),
+                    "true");
+        } else {// if (type == Type.LINE){
+            return String.format(lineChartDataSetTemplate,
+                    label,
+                    color,
+                    numericalListToString(data),
+                    "false");
+        }
     }
 
     private String listToString(List<String> list) {
@@ -111,20 +125,26 @@ public class Chart {
     public static final class Builder {
         private ArrayList<String> labels;
         private ArrayList<ChartDataSet> allData = null;
+        private Type type;
+
+        public Builder setType(Type type) {
+            this.type = type;
+            return this;
+        }
 
         public Builder setLabels(ArrayList<String> labels) {
             this.labels = labels;
             return this;
         }
 
-        public Builder setDataSet(String label, String color, ArrayList<Integer> data) {
+        public Builder addDataSet(String label, String color, ArrayList<Integer> data) {
             if (allData == null) allData = new ArrayList<ChartDataSet>();
             allData.add(new ChartDataSet(label, color, data));
             return this;
         }
 
         public Chart build() {
-            return new Chart(labels, allData);
+            return new Chart(type, labels, allData);
         }
     }
 

@@ -50,7 +50,7 @@ public class PingController {
     @ApiOperation(value = "Summary for the day", notes = "Summary of all pings for a certain day. Day in date format")
     public ResponseEntity<Collection<PingSummary>> getPingDaySumamry(@RequestParam(name="date", required=false) String strDate) {
         LocalDate date = DateTools.stringToDate(strDate);
-        Collection<PingSummary> data = pingService.getPingSummary(date);
+        Collection<PingSummary> data = pingService.getPingHourSummary(date);
         return !data.isEmpty() ? ResponseEntity.ok(data) : ResponseEntity.notFound().build();
     }
 }

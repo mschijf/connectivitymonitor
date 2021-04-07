@@ -3,9 +3,9 @@ package com.ms.raspberry.view;
 import java.util.ArrayList;
 
 public class ChartDataSet {
-    String label;
-    String color;
-    ArrayList<Integer> list;
+    private String label;
+    private String color;
+    private ArrayList<Integer> list;
 
     public ChartDataSet(String label, String color, ArrayList<Integer> list) {
         this.label = label;

@@ -16,15 +16,15 @@ class ChartTest {
         ArrayList<Integer> data = new ArrayList(Arrays.asList(1,2,3));
         chart = Chart.newBuilder()
                 .setLabels(labels)
-                .setDataSet("set1", "#aabbcc", data)
-                .setDataSet("set2", "#xxyyzz", data)
+                .addDataSet("set1", "#aabbcc", data)
+                .addDataSet("set2", "#xxyyzz", data)
                 .build();
     }
 
     @Test
     public void testJs() {
         System.out.println(chart.getHtml());
-        System.out.println(chart.getBarChartJs());
+        System.out.println(chart.getJs());
     }
 
 }

@@ -5,6 +5,7 @@ import com.ms.raspberry.service.PingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -43,45 +44,75 @@ public class HtmlPageService {
 
     public String getPage() {
 
-        Collection<PingSummary> summary = pingService.getPingSummary();
-        ArrayList<Integer>transmitted = summary.stream()
-                .map(s->s.getTotalPacketsTransmitted())
-                .collect(Collectors.toCollection(ArrayList::new));
-        ArrayList<Integer>received = summary.stream()
-                .map(s->s.getTotalPacketsReceived())
-                .collect(Collectors.toCollection(ArrayList::new));
-        ArrayList<Integer>min = summary.stream()
-                .map(s->s.getMinTimeMillis())
-                .collect(Collectors.toCollection(ArrayList::new));
-        ArrayList<Integer>avg = summary.stream()
-                .map(s->s.getAvgTimeMillis())
-                .collect(Collectors.toCollection(ArrayList::new));
-        ArrayList<Integer>max = summary.stream()
-                .map(s->s.getMaxTimeMillis())
-                .collect(Collectors.toCollection(ArrayList::new));
-        ArrayList<String> labels = summary.stream()
-                .map(s->s.getFromDate().toString())
-                .collect(Collectors.toCollection(ArrayList::new));
+        Collection<PingSummary> summaryDay = pingService.getPingDaySummary();
+        Collection<PingSummary> summaryHour = pingService.getPingHourSummary();
 
         Chart chart = Chart.newBuilder()
-                .setLabels(labels)
-                .setDataSet("Transmitted", "#3e95cd", transmitted)
-                .setDataSet("Received", "#0000ff", received)
+                .setType(Chart.Type.BAR)
+                .setLabels(getRunDayMonth(summaryDay))
+                .addDataSet("Transmitted", "#3e95cd", getTotalTransmitted(summaryDay))
+                .addDataSet("Received", "#0000ff", getTotalReceived(summaryDay))
                 .build();
 
         Chart chart2 = Chart.newBuilder()
-                .setLabels(labels)
-                .setDataSet("Min time (ms)", "#00ff00", min)
-                .setDataSet("Avg time (ms)", "#ff0000", avg)
-                .setDataSet("Max time (ms)", "#ff0000", max)
+                .setType(Chart.Type.LINE)
+                .setLabels(getRunTime(summaryHour))
+                .addDataSet("Min time (ms)", "#00ff00", getMinTime(summaryHour))
+                .addDataSet("Avg time (ms)", "#0000ff", getAvgTime(summaryHour))
+                .addDataSet("Max time (ms)", "#ff0000", getMaxTime(summaryHour))
                 .build();
 
         return String.format(pageTemplate,
                 chart.getHtml(),
                 chart2.getHtml(),
-                chart.getBarChartJs(),
-                chart2.getLineChartJs()
+                chart.getJs(),
+                chart2.getJs()
                 );
     }
+
+
+    private ArrayList<Integer> getTotalReceived(Collection<PingSummary> summary) {
+        return summary.stream()
+                .map(PingSummary::getTotalPacketsReceived)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+    private ArrayList<Integer> getTotalTransmitted(Collection<PingSummary> summary) {
+        return summary.stream()
+                .map(PingSummary::getTotalPacketsTransmitted)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+    private ArrayList<Integer> getMinTime(Collection<PingSummary> summary) {
+        return summary.stream()
+                .map(PingSummary::getMinTimeMillis)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+    private ArrayList<Integer> getMaxTime(Collection<PingSummary> summary) {
+        return summary.stream()
+                .map(PingSummary::getMaxTimeMillis)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+    private ArrayList<Integer> getAvgTime(Collection<PingSummary> summary) {
+        return summary.stream()
+                .map(PingSummary::getAvgTimeMillis)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+    private ArrayList<String> getRunTime(Collection<PingSummary> summary) {
+        return summary.stream()
+                .map(s->getTimeString(s.getFromDate()))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+    private ArrayList<String> getRunDayMonth(Collection<PingSummary> summary) {
+        return summary.stream()
+                .map(s->getDayMonthString(s.getFromDate()))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private String getTimeString(LocalDateTime dateTime) {
+        return String.format("%02d:%02d", dateTime.getHour(), dateTime.getMinute());
+    }
+    private String getDayMonthString(LocalDateTime dateTime) {
+        return String.format("%02d-%02d", dateTime.getMonthValue(), dateTime.getDayOfMonth());
+    }
+
 
 }
