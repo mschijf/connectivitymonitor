@@ -5,9 +5,9 @@ import java.util.ArrayList;
 public class ChartDataSet {
     private String label;
     private String color;
-    private ArrayList<Integer> list;
+    private ArrayList<? extends Number> list;
 
-    public ChartDataSet(String label, String color, ArrayList<Integer> list) {
+    public ChartDataSet(String label, String color, ArrayList<? extends Number> list) {
         this.label = label;
         this.color = color;
         this.list = list;
@@ -21,7 +21,7 @@ public class ChartDataSet {
         return color;
     }
 
-    public ArrayList<Integer> getList() {
+    public ArrayList<? extends Number> getList() {
         return list;
     }
 }

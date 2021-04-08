@@ -55,8 +55,7 @@ public class HtmlPageService {
         Chart chart = Chart.newBuilder()
                 .setType(Chart.Type.BAR)
                 .setLabels(getRunDayMonth(summaryDay))
-                .addDataSet("Transmitted", "#3e95cd", getTotalTransmitted(summaryDay))
-                .addDataSet("Received", "#0000ff", getTotalReceived(summaryDay))
+                .addDataSet("Missed packets", "#3e95cd", getTotalPacketsMissed(summaryDay))
                 .build();
 
         Chart chart2 = Chart.newBuilder()
@@ -96,6 +95,17 @@ public class HtmlPageService {
                 .map(PingSummary::getTotalPacketsTransmitted)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
+    private ArrayList<Integer> getTotalPacketsMissed(Collection<PingSummary> summary) {
+        return summary.stream()
+                .map(s->(s.getTotalPacketsTransmitted() - s.getTotalPacketsReceived()))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+    private ArrayList<Double> getPercentagePacketsMissed(Collection<PingSummary> summary) {
+        return summary.stream()
+                .map(s->(100.0 * (s.getTotalPacketsTransmitted() - s.getTotalPacketsReceived())/s.getTotalPacketsTransmitted()))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private ArrayList<Integer> getMinTime(Collection<PingSummary> summary) {
         return summary.stream()
                 .map(PingSummary::getMinTimeMillis)

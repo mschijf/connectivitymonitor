@@ -76,7 +76,7 @@ public class Chart {
                 identifier, type.toString().toLowerCase(),
                 listToString(labels),
                 getAllDataSets(allData),
-                35);
+                0);
     }
 
     private String getAllDataSets(ArrayList<ChartDataSet> allData) {
@@ -85,7 +85,7 @@ public class Chart {
                 .collect(Collectors.joining(","));
     }
 
-    private String getDataSet(String label, String color, List<Integer> data) {
+    private String getDataSet(String label, String color, List<? extends Number> data) {
         if (type == Type.BAR) {
             return String.format(barChartDataSetTemplate,
                     label,
@@ -115,7 +115,7 @@ public class Chart {
         return listToString(colorList);
     }
 
-    private String numericalListToString(List<Integer> list) {
+    private String numericalListToString(List<? extends Number> list) {
         return list.stream()
                 .map(Object::toString)
                 .collect(Collectors.joining(","));
@@ -137,7 +137,7 @@ public class Chart {
             return this;
         }
 
-        public Builder addDataSet(String label, String color, ArrayList<Integer> data) {
+        public Builder addDataSet(String label, String color, ArrayList<? extends Number> data) {
             if (allData == null) allData = new ArrayList<ChartDataSet>();
             allData.add(new ChartDataSet(label, color, data));
             return this;
