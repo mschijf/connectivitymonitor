@@ -15,9 +15,8 @@ public class HtmlController {
     private HtmlPageService htmlPageService;
 
     @GetMapping("/html")
-    public String getSpeedTestRecord() {
+    public String getPingGraphPage() {
         return htmlPageService.getPage();
     }
-
 
 }

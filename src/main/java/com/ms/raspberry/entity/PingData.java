@@ -3,30 +3,6 @@ package com.ms.raspberry.entity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-//
-//select
-//        date_trunc('hour', run_date_time) thehour, -- or hour, day, week, month, year
-//        sum(packets_transmitted), sum(packets_received), min(mintime_millis), avg(avgtime_millis), max(maxtime_millis)
-//        from cmddata.ping p
-//        group by 1
-//        having date_trunc('hour', run_date_time) = date_trunc('hour',  TIMESTAMP '2021-04-03 20:00:00')
-//        ;
-//
-//        select
-//        date_trunc('minute', run_date_time) thehour, -- or hour, day, week, month, year
-//        sum(packets_transmitted), sum(packets_received), min(mintime_millis), avg(avgtime_millis), max(maxtime_millis)
-//        from cmddata.ping p
-//        group by 1
-//        having date_trunc('minute', run_date_time) = date_trunc('hour',  TIMESTAMP '2021-04-03 20:00:00')
-//        ;
-//
-//
-//        select
-//        date_trunc('day', run_date_time), -- or hour, day, week, month, year
-//        sum(packets_transmitted), sum(packets_received), min(mintime_millis), avg(avgtime_millis), max(maxtime_millis)
-//        from cmddata.ping p
-//        group by 1;
-
 @Table(name="ping")
 @Entity(name="ping")
 public class PingData {

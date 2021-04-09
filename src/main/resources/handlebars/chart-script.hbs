@@ -1,0 +1,29 @@
+<script>
+    new Chart(document.getElementById("{{identifier}}"), {
+        type: '{{type}}',
+        data: {
+            labels: [{{#each labels}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}],
+            datasets: [
+                {{#each allData}}
+                    {
+                        label: "{{label}}",
+                        borderColor: "{{color}}",
+                        backgroundColor: "{{color}}",
+                        data: [{{#each list}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}],
+                        fill: {{fill}}
+                    }{{#unless @last}}, {{/unless}}
+                {{/each}}
+            ]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+

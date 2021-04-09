@@ -1,47 +1,23 @@
 package com.ms.raspberry.view;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import com.ms.raspberry.entity.PingSummary;
 import com.ms.raspberry.service.PingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 @Service
 public class HtmlPageService {
-    private static final String pageTemplate =
-            "<!DOCTYPE html>\n" +
-                    "<html>\n" +
-                    "<head>\n" +
-                    "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js\"></script>\n" +
-                    "</head>\n" +
-                    "<body>\n" +
-                    "<a href=\"/swagger-ui/\">GA NAAR SWAGGER</a>\n" +
-                    "<table>\n" +
-                    "    <thead>\n" +
-                    "        <tr>\n" +
-                    "            <th colspan=\"2\">Ping statistics</th>\n" +
-                    "        </tr>\n" +
-                    "    </thead>\n" +
-                    "    <tbody>\n" +
-                    "        <tr>\n" +
-                    "            <td>%s</td>\n" +
-                    "            <td>%s</td>\n" +
-                    "        <tr>\n" +
-                    "            <td>%s</td>\n" +
-                    "            <td></td>\n" +
-                    "        </tr>\n" +
-                    "    </tbody>\n" +
-                    "</table>\n" +
-                    "%s" +
-                    "%s" +
-                    "%s" +
-                    "</body>\n" +
-                    "\n" +
-                    "</html>";
 
     @Autowired
     private PingService pingService;
@@ -52,36 +28,45 @@ public class HtmlPageService {
         Collection<PingSummary> summaryHour = pingService.getPingHourSummary();
         Collection<PingSummary> summaryMinute = pingService.getPingMinuteSummary();
 
-        Chart chart = Chart.newBuilder()
-                .setType(Chart.Type.BAR)
-                .setLabels(getRunDayMonth(summaryDay))
-                .addDataSet("Missed packets", "#3e95cd", getTotalPacketsMissed(summaryDay))
-                .build();
+        HashMap<String, ChartData> allCharts = new HashMap<>();
+        allCharts.put("packetsLostPerDay",
+                ChartData.newBuilder()
+                        .setType(ChartData.Type.bar)
+                        .setLabels(getRunDayMonth(summaryDay))
+                        .addDataSet("Missed packets", "#3e95cd", getTotalPacketsMissed(summaryDay))
+                        .build()
+        );
 
-        Chart chart2 = Chart.newBuilder()
-                .setType(Chart.Type.LINE)
-                .setLabels(getRunTime(summaryHour))
-                .addDataSet("Min time (ms)", "#00ff00", getMinTime(summaryHour))
-                .addDataSet("Avg time (ms)", "#0000ff", getAvgTime(summaryHour))
-                .addDataSet("Max time (ms)", "#ff0000", getMaxTime(summaryHour))
-                .build();
+        allCharts.put("pingTimesPerHour",
+                ChartData.newBuilder()
+                    .setType(ChartData.Type.line)
+                    .setLabels(getRunTime(summaryHour))
+                    .addDataSet("Min time (ms)", "#00ff00", getMinTime(summaryHour))
+                    .addDataSet("Avg time (ms)", "#0000ff", getAvgTime(summaryHour))
+                    .addDataSet("Max time (ms)", "#ff0000", getMaxTime(summaryHour))
+                    .build()
+        );
 
-        Chart chart3 = Chart.newBuilder()
-                .setType(Chart.Type.LINE)
-                .setLabels(getRunTime(summaryMinute))
-                .addDataSet("Min time (ms)", "#00ff00", getMinTime(summaryMinute))
-                .addDataSet("Avg time (ms)", "#0000ff", getAvgTime(summaryMinute))
-                .addDataSet("Max time (ms)", "#ff0000", getMaxTime(summaryMinute))
-                .build();
+        allCharts.put("pingTimesPerMinute",
+                ChartData.newBuilder()
+                    .setType(ChartData.Type.line)
+                    .setLabels(getRunTime(summaryMinute))
+                    .addDataSet("Min time (ms)", "#00ff00", getMinTime(summaryMinute))
+                    .addDataSet("Avg time (ms)", "#0000ff", getAvgTime(summaryMinute))
+                    .addDataSet("Max time (ms)", "#ff0000", getMaxTime(summaryMinute))
+                    .build()
+        );
 
-        return String.format(pageTemplate,
-                chart.getHtml(),
-                chart2.getHtml(),
-                chart3.getHtml(),
-                chart.getJs(),
-                chart2.getJs(),
-                chart3.getJs()
-                );
+
+        TemplateLoader loader = new ClassPathTemplateLoader("/handlebars", ".hbs");
+        Handlebars handlebars = new Handlebars(loader);
+        try {
+            Template template = handlebars.compile("chart");
+            return template.apply(allCharts);
+        } catch (IOException ioe) {
+            System.out.println("foutje!" + ioe);
+            return "foutje!" + ioe;
+        }
     }
 
 

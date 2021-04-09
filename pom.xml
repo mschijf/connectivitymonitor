@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.ms</groupId>
     <artifactId>raspberry</artifactId>
-    <version>0.94</version>
+    <version>0.99</version>
     <name>raspberry</name>
     <description>Raspberry-pi project from martin</description>
     <properties>
@@ -64,6 +64,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <version>2.2.6.RELEASE</version>
+        </dependency>
+
+        <!-- handlebars -->
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>4.1.2</version>
         </dependency>
     </dependencies>
 

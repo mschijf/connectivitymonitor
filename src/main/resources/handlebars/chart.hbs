@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    </head>
+    <body>
+        <a href="/swagger-ui/">GA NAAR SWAGGER</a>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">Ping statistics</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><canvas id="{{packetsLostPerDay.identifier}}" width="600" height="350"></canvas></td>
+                    <td><canvas id="{{pingTimesPerHour.identifier}}" width="600" height="350"></canvas></td>
+                </tr>
+                <tr>
+                    <td><canvas id="{{pingTimesPerMinute.identifier}}" width="600" height="350"></canvas></td>
+                    <td>TWEEDE RIJ , TWEEDE KOLOM</td>
+                </tr>
+            </tbody>
+        </table>
+        {{#each}}{{>chart-script}}{{/each}}
+    </body>
+</html>
