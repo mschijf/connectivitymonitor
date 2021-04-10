@@ -12,7 +12,7 @@ import java.util.Optional;
 @Profile("default")
 @Component
 public class OoklaSpeedTestExecutorMock implements OoklaSpeedTestExecutor {
-    private OoklaJsonParser ooklaOutputParser;
+    private final OoklaJsonParser ooklaOutputParser;
 
     @Autowired
     public OoklaSpeedTestExecutorMock(OoklaJsonParser ooklaOutputParser) {
@@ -23,7 +23,7 @@ public class OoklaSpeedTestExecutorMock implements OoklaSpeedTestExecutor {
         return ooklaOutputParser.ooklaOutputToSpeedTestData(mockOutput);
     }
 
-    private String mockOutput =
+    private static final String mockOutput =
             "{\n" +
             "  \"download\": {\n" +
             "    \"bandwidth\": 31842214, \n" +
