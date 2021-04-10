@@ -13,15 +13,17 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><canvas id="{{packetsLostPerDay.identifier}}" width="600" height="350"></canvas></td>
-                    <td><canvas id="{{pingTimesPerHour.identifier}}" width="600" height="350"></canvas></td>
+                    <td>{{>chart-line packetsLostPerDay}}</td>
+                    <td>{{>chart-line pingTimesPerHour}}</td>
                 </tr>
                 <tr>
-                    <td><canvas id="{{pingTimesPerMinute.identifier}}" width="600" height="350"></canvas></td>
-                    <td>TWEEDE RIJ , TWEEDE KOLOM</td>
+                    <td>{{>chart-line pingTimesPerMinute}}</td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
-        {{#each}}{{>chart-script}}{{/each}}
+        {{>chart-script packetsLostPerDay}}
+        {{>chart-script pingTimesPerHour}}
+        {{>chart-script pingTimesPerMinute}}
     </body>
 </html>

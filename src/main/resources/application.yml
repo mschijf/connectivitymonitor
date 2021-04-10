@@ -2,9 +2,9 @@ spring:
   application:
     name: raspberry
   datasource:
-    url: jdbc:postgresql://192.168.178.59:5432/cmdtst?currentSchema=cmddata
-    username: cmdtst
-    password: cmdtst!1234
+    url: jdbc:postgresql://localhost:5432/cmddev?currentSchema=cmddata
+    username: cmddev
+    password: cmddev
 
   flyway:
     enabled: true
@@ -13,6 +13,19 @@ spring:
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
 
+schedule:
+  #  runspeedtest:
+  #    cron: 0 * * * * ?
+  runping:
+    cron: 0 * * * * ?
+
+---
+spring:
+  config.activate.on-profile: test
+  datasource:
+    url: jdbc:postgresql://192.168.178.59:5432/cmdtst?currentSchema=cmddata
+    username: cmdtst
+    password: cmdtst!1234
 ---
 spring:
   config.activate.on-profile: prod

@@ -61,7 +61,7 @@ public class HtmlPageService {
         TemplateLoader loader = new ClassPathTemplateLoader("/handlebars", ".hbs");
         Handlebars handlebars = new Handlebars(loader);
         try {
-            Template template = handlebars.compile("chart");
+            Template template = handlebars.compile("chart-page");
             return template.apply(allCharts);
         } catch (IOException ioe) {
             System.out.println("foutje!" + ioe);
