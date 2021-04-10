@@ -1,12 +1,15 @@
 <script>
     function doAjaxCall(elementId) {
-        document.getElementById("result").innerHTML = "running...";
+        document.getElementById("progress").innerHTML = "Getting (new) results. Waiting...";
         var request = new XMLHttpRequest();
         request.open("POST", "/v1/speedtest/");
         request.onreadystatechange = function() {
             if(this.readyState === 4 && this.status === 200) {
                 var obj = JSON.parse(this.responseText);
-                document.getElementById(elementId).innerHTML = (obj.downloadSpeedBytes * 8 ) / 1000000 + " Mbps";
+                document.getElementById('rundatetime').innerHTML = obj.runDateTime;
+                document.getElementById('downloadspeed').innerHTML = (obj.downloadSpeedBytes * 8 ) / 1000000 + " Mbps";
+                document.getElementById('uploadspeed').innerHTML = (obj.uploadSpeedBytes * 8 ) / 1000000 + " Mbps";
+                document.getElementById("progress").innerHTML = "";
             }
         };
         request.send();

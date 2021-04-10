@@ -5,7 +5,7 @@
         {{> speedtest-script }}
     </head>
     <body>
-        <a href="/swagger-ui/">GA NAAR SWAGGER</a>
+        {{>goto-swagger}}
         <table>
             <thead>
                 <tr>
@@ -19,7 +19,7 @@
                 </tr>
                 <tr>
                     <td>{{>chart-line pingTimesPerMinute}}</td>
-                    <td>{{>speedtest-button}}</td>
+                    <td>{{>speedtest-component}}</td>
                 </tr>
             </tbody>
         </table>
