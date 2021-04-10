@@ -1,11 +1,9 @@
 package com.ms.raspberry.service;
 
-import com.ms.raspberry.entity.SpeedTestData;
 import com.ms.raspberry.commandline.ookla.OoklaJsonParser;
+import com.ms.raspberry.entity.SpeedTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -13,7 +11,7 @@ class OoklaJsonParserTest {
 
     private SpeedTestData dataToTest;
 
-    private String jsonString =
+    private static final String jsonString =
             "{\n" +
                     "  \"download\": {\n" +
                     "    \"bandwidth\": 31842214, \n" +
@@ -56,9 +54,9 @@ class OoklaJsonParserTest {
                     "}\n";
 
     @BeforeEach()
-    void initTest() throws IOException {
+    void initTest()  {
         OoklaJsonParser ooklaOutputParser = new OoklaJsonParser();
-        dataToTest = ooklaOutputParser.ooklaOutputToSpeedTestData(jsonString).get();
+        dataToTest = ooklaOutputParser.ooklaOutputToSpeedTestData(jsonString).orElse(null);
     }
 
     @Test

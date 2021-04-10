@@ -3,22 +3,17 @@ package com.ms.raspberry.service;
 import com.ms.raspberry.commandline.ping.PingExecutor;
 import com.ms.raspberry.entity.PingData;
 import com.ms.raspberry.entity.PingSummary;
-import com.ms.raspberry.repository.PingRepository;
 import com.ms.raspberry.repository.PingQueryRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.ms.raspberry.repository.PingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 
 @Service
 public class PingService {
-
-    private static final Logger log = LoggerFactory.getLogger(PingService.class);
 
     PingRepository pingRepository;
     PingQueryRepository pingQueryRepository;
@@ -53,6 +48,7 @@ public class PingService {
     public Collection<PingSummary> getPingDaySummary() {
         return pingQueryRepository.getDaySummary();
     }
+
     public Collection<PingSummary> getPingHourSummary() {
         return pingQueryRepository.getHourSummary();
     }

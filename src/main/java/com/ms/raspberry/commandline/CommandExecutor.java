@@ -1,8 +1,6 @@
 package com.ms.raspberry.commandline;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,15 +17,14 @@ public class CommandExecutor {
         BufferedReader stdError = new BufferedReader(new
                 InputStreamReader(proc.getErrorStream()));
 
-
         String s;
         StringBuilder outputLines = new StringBuilder();
         while ((s = stdInput.readLine()) != null) {
-            outputLines.append(s+"\n");
+            outputLines.append(s).append("\n");
         }
 
         while ((s = stdError.readLine()) != null) {
-            outputLines.append(s+"\n");
+            outputLines.append(s).append("\n");
         }
         return outputLines.toString();
     }

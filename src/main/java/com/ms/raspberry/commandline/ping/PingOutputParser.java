@@ -1,8 +1,6 @@
 package com.ms.raspberry.commandline.ping;
 
 import com.ms.raspberry.entity.PingData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -12,7 +10,6 @@ import java.util.regex.Pattern;
 
 @Component
 public class PingOutputParser {
-    private static final Logger log = LoggerFactory.getLogger(PingOutputParser.class);
 
     public Optional<PingData> parsePingOutput(LocalDateTime startTime, String host, String pingOutput) {
         Pattern patternSummary = Pattern.compile("r.+ min/avg/max/.+dev = (.*?)/(.*?)/(.*?)/(.*?) ms\\n");
@@ -40,7 +37,7 @@ public class PingOutputParser {
     private static Integer parseToIntegerOrNull(String s) throws NullPointerException {
         try {
             double d = Double.parseDouble(s);
-            return Integer.valueOf((int) Math.round(d));
+            return (int) Math.round(d);
         } catch (Exception e) {
             return null;
         }

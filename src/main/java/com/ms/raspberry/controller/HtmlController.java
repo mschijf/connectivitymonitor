@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HtmlController {
 
+    private final HtmlPageService htmlPageService;
+
     @Autowired
-    private HtmlPageService htmlPageService;
+    public HtmlController(HtmlPageService htmlPageService) {
+        this.htmlPageService = htmlPageService;
+    }
 
     @GetMapping("/html")
     public String getPingGraphPage() {

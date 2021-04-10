@@ -42,63 +42,31 @@ public class PingData {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public LocalDateTime getRunDateTime() {
         return runDateTime;
-    }
-
-    public void setRunDateTime(LocalDateTime runDateTime) {
-        this.runDateTime = runDateTime;
     }
 
     public Integer getPacketsTransmitted() {
         return packetsTransmitted;
     }
 
-    public void setPacketsTransmitted(Integer packetsTransmitted) {
-        this.packetsTransmitted = packetsTransmitted;
-    }
-
     public Integer getPacketsReceived() {
         return packetsReceived;
-    }
-
-    public void setPacketsReceived(Integer packetsReceived) {
-        this.packetsReceived = packetsReceived;
     }
 
     public Integer getMinTimeMillis() {
         return minTimeMillis;
     }
 
-    public void setMinTimeMillis(Integer minTimeMillis) {
-        this.minTimeMillis = minTimeMillis;
-    }
-
     public Integer getAvgTimeMillis() {
         return avgTimeMillis;
-    }
-
-    public void setAvgTimeMillis(Integer avgTimeMillis) {
-        this.avgTimeMillis = avgTimeMillis;
     }
 
     public Integer getMaxTimeMillis() {
         return maxTimeMillis;
     }
 
-    public void setMaxTimeMillis(Integer maxTimeMillis) {
-        this.maxTimeMillis = maxTimeMillis;
-    }
-
     public String getHost() {
         return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
     }
 }

@@ -63,63 +63,31 @@ public class SpeedTestData {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public LocalDateTime getRunDateTime() {
         return runDateTime;
-    }
-
-    public void setRunDateTime(LocalDateTime runDateTime) {
-        this.runDateTime = runDateTime;
     }
 
     public Double getLatencyMillis() {
         return latencyMillis;
     }
 
-    public void setLatencyMillis(Double latencyMillis) {
-        this.latencyMillis = latencyMillis;
-    }
-
     public Double getJitterMillis() {
         return jitterMillis;
-    }
-
-    public void setJitterMillis(Double jitterMillis) {
-        this.jitterMillis = jitterMillis;
     }
 
     public Integer getDownloadSpeedBytes() {
         return downloadSpeedBytes;
     }
 
-    public void setDownloadSpeedBytes(Integer downloadSpeedBytes) {
-        this.downloadSpeedBytes = downloadSpeedBytes;
-    }
-
     public Integer getUploadSpeedBytes() {
         return uploadSpeedBytes;
-    }
-
-    public void setUploadSpeedBytes(Integer uploadSpeedBytes) {
-        this.uploadSpeedBytes = uploadSpeedBytes;
     }
 
     public Double getPacketLoss() {
         return packetLoss;
     }
 
-    public void setPacketLoss(Double packetLoss) {
-        this.packetLoss = packetLoss;
-    }
-
     public String getAllOutput() {
         return allOutput;
-    }
-
-    public void setAllOutput(String allOutput) {
-        this.allOutput = allOutput;
     }
 }

@@ -5,7 +5,6 @@ import com.ms.raspberry.entity.PingData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,14 +55,14 @@ class PingOutputParserTest {
     LocalDateTime now;
 
     @BeforeEach()
-    void initTest() throws IOException {
+    void initTest() {
         pingOutputParser = new PingOutputParser();
         now = LocalDateTime.now();
     }
 
     @Test
     void macTest() {
-        PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextMac).get();
+        PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextMac).orElse(new PingData());
         assertEquals(4, dataToTest.getPacketsTransmitted());
         assertEquals(4, dataToTest.getPacketsReceived());
         assertEquals(11, dataToTest.getMinTimeMillis());
@@ -75,7 +74,7 @@ class PingOutputParserTest {
 
     @Test
     void raspberryTest() {
-        PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextRaspBerry).get();
+        PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextRaspBerry).orElse(new PingData());
         assertEquals(4, dataToTest.getPacketsTransmitted());
         assertEquals(4, dataToTest.getPacketsReceived());
         assertEquals(17, dataToTest.getMinTimeMillis());
@@ -87,7 +86,7 @@ class PingOutputParserTest {
 
     @Test
     void raspberryNoPacketsTest() {
-        PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextNoConnection).get();
+        PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextNoConnection).orElse(new PingData());
         assertEquals(4, dataToTest.getPacketsTransmitted());
         assertEquals(0, dataToTest.getPacketsReceived());
         assertNull(dataToTest.getMinTimeMillis());
@@ -99,7 +98,7 @@ class PingOutputParserTest {
 
     @Test
     void raspberryNoPacketsTest2() {
-        PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextNoConnection2).get();
+        PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextNoConnection2).orElse(new PingData());
         assertEquals(4, dataToTest.getPacketsTransmitted());
         assertEquals(0, dataToTest.getPacketsReceived());
         assertNull(dataToTest.getMinTimeMillis());

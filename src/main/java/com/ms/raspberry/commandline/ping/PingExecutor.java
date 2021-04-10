@@ -2,7 +2,6 @@ package com.ms.raspberry.commandline.ping;
 
 import com.ms.raspberry.commandline.CommandExecutor;
 import com.ms.raspberry.entity.PingData;
-import org.apache.tomcat.jni.Local;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,8 @@ public class PingExecutor {
 
     private static final String PING_COMMAND = "ping ziggo.nl -c 4 -p 10";
 
-    private CommandExecutor commandExecutor;
-    private PingOutputParser pingOutputParser;
+    private final CommandExecutor commandExecutor;
+    private final PingOutputParser pingOutputParser;
 
     @Autowired
     public PingExecutor(CommandExecutor commandExecutor, PingOutputParser pingOutputParser) {

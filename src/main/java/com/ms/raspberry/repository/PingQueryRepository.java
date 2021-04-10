@@ -3,28 +3,26 @@ package com.ms.raspberry.repository;
 import com.ms.raspberry.entity.PingSummary;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
 public interface PingQueryRepository extends CrudRepository<PingSummary, LocalDateTime> {
-    static final String DAY_SUMMARY_SELECT =
+    String DAY_SUMMARY_SELECT =
             "select " +
                     " date_trunc('day', run_date_time) date_time," +
                     " sum(packets_transmitted) total_transmitted, sum(packets_received) total_received, " +
                     " min(mintime_millis) min_time_millis, avg(avgtime_millis) avg_time_millis, max(maxtime_millis) max_time_millis " +
                     "from cmddata.ping ";
 
-    static final String HOUR_SUMMARY_SELECT =
+    String HOUR_SUMMARY_SELECT =
             "select " +
                     " date_trunc('hour', run_date_time) date_time," +
                     " sum(packets_transmitted) total_transmitted, sum(packets_received) total_received, " +
                     " min(mintime_millis) min_time_millis, avg(avgtime_millis) avg_time_millis, max(maxtime_millis) max_time_millis " +
                     "from cmddata.ping ";
 
-    static final String MINUTE_SUMMARY_SELECT =
+    String MINUTE_SUMMARY_SELECT =
             "select " +
                     " date_trunc('minute', run_date_time) date_time," +
                     " packets_transmitted total_transmitted, packets_received total_received, " +

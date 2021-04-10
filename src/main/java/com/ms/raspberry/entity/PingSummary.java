@@ -21,21 +21,6 @@ public class PingSummary {
     @Column(name = "max_time_millis")
     private int maxTimeMillis;
 
-
-    public PingSummary() {
-
-    }
-
-
-    public PingSummary(LocalDateTime fromDate, int totalPacketsTransmitted, int totalPacketsReceived, int minTimeMillis, int avgTimeMillis, int maxTimeMillis) {
-        this.fromDate = fromDate;
-        this.totalPacketsTransmitted = totalPacketsTransmitted;
-        this.totalPacketsReceived = totalPacketsReceived;
-        this.minTimeMillis = minTimeMillis;
-        this.avgTimeMillis = avgTimeMillis;
-        this.maxTimeMillis = maxTimeMillis;
-    }
-
     public LocalDateTime getFromDate() {
         return fromDate;
     }
