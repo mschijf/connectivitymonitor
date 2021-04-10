@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Profile("default")
 @Component
@@ -20,6 +21,11 @@ public class OoklaSpeedTestExecutorMock implements OoklaSpeedTestExecutor {
     }
 
     public Optional<SpeedTestData> execute() {
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException ie) {
+
+        }
         return ooklaOutputParser.ooklaOutputToSpeedTestData(mockOutput);
     }
 

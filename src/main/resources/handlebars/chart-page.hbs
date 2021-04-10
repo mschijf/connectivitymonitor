@@ -2,6 +2,7 @@
 <html>
     <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        {{> speedtest-script }}
     </head>
     <body>
         <a href="/swagger-ui/">GA NAAR SWAGGER</a>
@@ -18,7 +19,7 @@
                 </tr>
                 <tr>
                     <td>{{>chart-line pingTimesPerMinute}}</td>
-                    <td></td>
+                    <td>{{>speedtest-button}}</td>
                 </tr>
             </tbody>
         </table>
