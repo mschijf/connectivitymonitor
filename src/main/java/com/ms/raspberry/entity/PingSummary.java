@@ -11,37 +11,37 @@ public class PingSummary {
     @Column(name = "date_time")
     private LocalDateTime fromDate;
     @Column(name = "total_transmitted")
-    private int totalPacketsTransmitted;
+    private Integer totalPacketsTransmitted;
     @Column(name = "total_received")
-    private int totalPacketsReceived;
+    private Integer totalPacketsReceived;
     @Column(name = "min_time_millis")
-    private int minTimeMillis;
+    private Integer minTimeMillis;
     @Column(name = "avg_time_millis")
-    private int avgTimeMillis;
+    private Integer avgTimeMillis;
     @Column(name = "max_time_millis")
-    private int maxTimeMillis;
+    private Integer maxTimeMillis;
 
     public LocalDateTime getFromDate() {
         return fromDate;
     }
 
-    public int getTotalPacketsTransmitted() {
+    public Integer getTotalPacketsTransmitted() {
         return totalPacketsTransmitted;
     }
 
-    public int getTotalPacketsReceived() {
+    public Integer getTotalPacketsReceived() {
         return totalPacketsReceived;
     }
 
-    public int getMinTimeMillis() {
+    public Integer getMinTimeMillis() {
         return minTimeMillis;
     }
 
-    public int getAvgTimeMillis() {
+    public Integer getAvgTimeMillis() {
         return avgTimeMillis;
     }
 
-    public int getMaxTimeMillis() {
+    public Integer getMaxTimeMillis() {
         return maxTimeMillis;
     }
 }
