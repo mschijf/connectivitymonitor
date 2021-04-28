@@ -21,16 +21,9 @@ schedule:
 
 ---
 spring:
-  config.activate.on-profile: test
-  datasource:
-    url: jdbc:postgresql://192.168.178.59:5432/cmdtst?currentSchema=cmddata
-    username: cmdtst
-    password: cmdtst!1234
----
-spring:
   config.activate.on-profile: prod
   datasource:
-    url: jdbc:postgresql://192.168.178.59:5432/cmdpro?currentSchema=cmddata
+    url: jdbc:postgresql://192.168.1.3:5432/cmdpro?currentSchema=cmddata
     username: cmdpro
     password: cmdpro!1234
 
@@ -39,7 +32,3 @@ schedule:
 #    cron: 0 * * * * ?
   runping:
     cron: 0 * * * * ?
-
-
-#cmdpro - cmdpro!1234
-#cmdtst - cmdtst!1234
