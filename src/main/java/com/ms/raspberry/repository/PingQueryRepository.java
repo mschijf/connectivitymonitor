@@ -36,7 +36,7 @@ public interface PingQueryRepository extends CrudRepository<PingSummary, LocalDa
     Collection<PingSummary> getDaySummary();
 
     @Query(value = HOUR_SUMMARY_SELECT +
-            " where run_date_time > now() - interval '168 hours'" +
+            " where run_date_time > now() - interval '48 hours'" +
             " group by 1" +
             " order by date_trunc('hour', run_date_time) ", nativeQuery = true)
     Collection<PingSummary> getHourSummary();

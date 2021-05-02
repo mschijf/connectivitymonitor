@@ -60,11 +60,9 @@ public class HtmlPageService {
     private ChartData createPingTimesPerHour() {
         Collection<PingSummary> summaryHour = pingService.getPingHourSummary();
         return ChartData.newBuilder()
-                .setType(ChartData.Type.line)
+                .setType(ChartData.Type.bar)
                 .setLabels(getRunTime(summaryHour))
-                .addDataSet("Min time (ms)", "#00ff00", getMinTime(summaryHour))
-                .addDataSet("Avg time (ms)", "#0000ff", getAvgTime(summaryHour))
-                .addDataSet("Max time (ms)", "#ff0000", getMaxTime(summaryHour))
+                .addDataSet("Missed packets", "#3e95cd", getTotalPacketsMissed(summaryHour))
                 .build();
     }
 
