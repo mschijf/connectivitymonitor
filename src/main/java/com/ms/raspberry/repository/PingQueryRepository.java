@@ -42,7 +42,7 @@ public interface PingQueryRepository extends CrudRepository<PingSummary, LocalDa
     Collection<PingSummary> getHourSummary();
 
     @Query(value = MINUTE_SUMMARY_SELECT +
-            " where run_date_time > now() - interval '30 minutes'" +
+            " where run_date_time > now() - interval '60 minutes'" +
             " order by run_date_time ", nativeQuery = true)
     Collection<PingSummary> getMinuteSummary();
 }
