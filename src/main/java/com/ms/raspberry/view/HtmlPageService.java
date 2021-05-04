@@ -33,9 +33,8 @@ public class HtmlPageService {
     public String getPage() {
 
         HashMap<String, ChartData> allCharts = new HashMap<>();
-        allCharts.put("packetsLostPerDay", createPacketsLostPerDayChart());
-        allCharts.put("pingTimesPerHour", createPingTimesPerHour());
-        allCharts.put("pingTimesPerMinute", createPingTimesPerMinute());
+        allCharts.put("graphPerMinute", createPacketsLostPerMinuteChart());
+        allCharts.put("graphPerHour", createPingTimesPerHour());
 
         TemplateLoader loader = new ClassPathTemplateLoader("/handlebars", ".hbs");
         Handlebars handlebars = new Handlebars(loader);
@@ -48,32 +47,21 @@ public class HtmlPageService {
         }
     }
 
-    private ChartData createPacketsLostPerDayChart() {
-        Collection<PingSummary> summaryDay = pingService.getPingDaySummary();
+    private ChartData createPacketsLostPerMinuteChart() {
+        Collection<PingSummary> summaryMinute = pingService.getPingMinuteSummary();
         return ChartData.newBuilder()
-                .setType(ChartData.Type.bar)
-                .setLabels(getRunDayMonth(summaryDay))
-                .addDataSet("Missed packets", "#3e95cd", getTotalPacketsMissed(summaryDay))
+                .setLabels(getRunTime(summaryMinute))
+                .addDataSet(ChartDataSet.Type.bar, "Missed packets", "#3e95cd", getTotalPacketsMissed(summaryMinute))
+                .addDataSet(ChartDataSet.Type.line, "Max time (ms)", "#ff0000", getMaxTime(summaryMinute))
                 .build();
     }
 
     private ChartData createPingTimesPerHour() {
         Collection<PingSummary> summaryHour = pingService.getPingHourSummary();
         return ChartData.newBuilder()
-                .setType(ChartData.Type.bar)
                 .setLabels(getRunTime(summaryHour))
-                .addDataSet("Missed packets", "#3e95cd", getTotalPacketsMissed(summaryHour))
-                .build();
-    }
-
-    private ChartData createPingTimesPerMinute() {
-        Collection<PingSummary> summaryMinute = pingService.getPingMinuteSummary();
-        return ChartData.newBuilder()
-                .setType(ChartData.Type.line)
-                .setLabels(getRunTime(summaryMinute))
-                .addDataSet("Min time (ms)", "#00ff00", getMinTime(summaryMinute))
-                .addDataSet("Avg time (ms)", "#0000ff", getAvgTime(summaryMinute))
-                .addDataSet("Max time (ms)", "#ff0000", getMaxTime(summaryMinute))
+                .addDataSet(ChartDataSet.Type.bar, "Missed packets", "#3e95cd", getTotalPacketsMissed(summaryHour))
+                .addDataSet(ChartDataSet.Type.line, "Max time (ms)", "#ff0000", getMaxTime(summaryHour))
                 .build();
     }
 

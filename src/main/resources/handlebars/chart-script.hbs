@@ -1,12 +1,13 @@
 <script>
     new Chart(document.getElementById("{{identifier}}"), {
-        type: '{{type}}',
+        type: 'bar',
         data: {
             labels: [{{#each labels}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}],
             datasets: [
                 {{#each allData}}
                     {
                         label: "{{label}}",
+                        type: '{{type}}',
                         borderColor: "{{color}}",
                         backgroundColor: "{{color}}",
                         data: [{{#each list}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}],

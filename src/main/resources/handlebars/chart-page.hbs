@@ -14,17 +14,15 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>{{>chart-line packetsLostPerDay}}</td>
-                    <td>{{>chart-line pingTimesPerHour}}</td>
+                    <td>{{>chart-line graphPerMinute}}</td>
+                    <td>{{>chart-line graphPerHour}}</td>
                 </tr>
                 <tr>
-                    <td>{{>chart-line pingTimesPerMinute}}</td>
                     <td>{{>speedtest-component}}</td>
                 </tr>
             </tbody>
         </table>
-        {{>chart-script packetsLostPerDay}}
-        {{>chart-script pingTimesPerHour}}
-        {{>chart-script pingTimesPerMinute}}
+        {{>chart-script graphPerMinute}}
+        {{>chart-script graphPerHour}}
     </body>
 </html>
