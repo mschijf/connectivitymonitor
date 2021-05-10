@@ -1,7 +1,7 @@
 package com.ms.raspberry.commandline.ookla;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ms.raspberry.entity.SpeedTestData;
+import com.ms.raspberry.entity.SpeedtestData;
 import com.ms.raspberry.commandline.ookla.responsemodel.OoklaResponseDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +14,12 @@ import java.util.Optional;
 public class OoklaJsonParser {
     private static final Logger log = LoggerFactory.getLogger(OoklaJsonParser.class);
 
-    public Optional<SpeedTestData> ooklaOutputToSpeedTestData(String ooklaOutput) {
+    public Optional<SpeedtestData> ooklaOutputToSpeedTestData(String ooklaOutput) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             OoklaResponseDC response = mapper.readValue(ooklaOutput, OoklaResponseDC.class);
             return Optional.of(
-                    new SpeedTestData(
+                    new SpeedtestData(
                             LocalDateTime.now(),
                             response.getPing().getLatency(),
                             response.getPing().getJitter(),
@@ -30,7 +30,7 @@ public class OoklaJsonParser {
                             );
         } catch (Exception exception) {
             log.error("Error while parsing ookla speedtest output {}", ooklaOutput);
-            return Optional.of(new SpeedTestData(LocalDateTime.now(), ooklaOutput));
+            return Optional.of(new SpeedtestData(LocalDateTime.now(), ooklaOutput));
         }
     }
 

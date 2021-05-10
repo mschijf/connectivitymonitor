@@ -1,7 +1,7 @@
 package com.ms.raspberry.commandline.ookla;
 
 import com.ms.raspberry.commandline.CommandExecutor;
-import com.ms.raspberry.entity.SpeedTestData;
+import com.ms.raspberry.entity.SpeedtestData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class OoklaSpeedTestExecutorImpl implements OoklaSpeedTestExecutor {
         this.ooklaOutputParser = ooklaOutputParser;
     }
 
-    public Optional<SpeedTestData> execute() {
+    public Optional<SpeedtestData> execute() {
         try {
             String outputLines = commandExecutor.execCommand(CLI_COMMAND);
             return ooklaOutputParser.ooklaOutputToSpeedTestData(outputLines);

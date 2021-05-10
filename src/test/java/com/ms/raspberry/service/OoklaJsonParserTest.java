@@ -1,7 +1,7 @@
 package com.ms.raspberry.service;
 
 import com.ms.raspberry.commandline.ookla.OoklaJsonParser;
-import com.ms.raspberry.entity.SpeedTestData;
+import com.ms.raspberry.entity.SpeedtestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class OoklaJsonParserTest {
 
-    private SpeedTestData dataToTest;
+    private SpeedtestData dataToTest;
 
     private static final String jsonString =
             "{\n" +

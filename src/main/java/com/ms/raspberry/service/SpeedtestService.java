@@ -1,8 +1,8 @@
 package com.ms.raspberry.service;
 
 import com.ms.raspberry.commandline.ookla.OoklaSpeedTestExecutor;
-import com.ms.raspberry.entity.SpeedTestData;
-import com.ms.raspberry.repository.SpeedTestRepository;
+import com.ms.raspberry.entity.SpeedtestData;
+import com.ms.raspberry.repository.SpeedtestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,32 +11,37 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
-public class SpeedTestService {
+public class SpeedtestService {
 
-    private static final Logger log = LoggerFactory.getLogger(SpeedTestService.class);
-    SpeedTestRepository repository;
+    private static final Logger log = LoggerFactory.getLogger(SpeedtestService.class);
+    SpeedtestRepository repository;
     OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
 
     @Autowired
-    public SpeedTestService(SpeedTestRepository repository, OoklaSpeedTestExecutor ooklaSpeedTestExecutor) {
+    public SpeedtestService(SpeedtestRepository repository, OoklaSpeedTestExecutor ooklaSpeedTestExecutor) {
         this.repository = repository;
         this.ooklaSpeedTestExecutor = ooklaSpeedTestExecutor;
     }
 
-    public Optional<SpeedTestData> doSpeedTest() {
-        Optional<SpeedTestData> speedTestData = ooklaSpeedTestExecutor.execute();
+    public Optional<SpeedtestData> doSpeedTest() {
+        Optional<SpeedtestData> speedTestData = ooklaSpeedTestExecutor.execute();
         if (speedTestData.isEmpty())
             return speedTestData;
 
-        SpeedTestData savedData = repository.save(speedTestData.get());
+        SpeedtestData savedData = repository.save(speedTestData.get());
         return Optional.of(savedData);
     }
 
-    public Optional<SpeedTestData> getSpeedTestData(Integer id) {
+    public Optional<SpeedtestData> getSpeedTestData(Integer id) {
         return repository.findById(id);
+    }
+
+    public Collection<SpeedtestData> getSpeedPerHour() {
+        return repository.getHourResults();
     }
 
 

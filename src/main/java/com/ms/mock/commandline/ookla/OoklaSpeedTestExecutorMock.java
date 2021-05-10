@@ -2,7 +2,7 @@ package com.ms.mock.commandline.ookla;
 
 import com.ms.raspberry.commandline.ookla.OoklaJsonParser;
 import com.ms.raspberry.commandline.ookla.OoklaSpeedTestExecutor;
-import com.ms.raspberry.entity.SpeedTestData;
+import com.ms.raspberry.entity.SpeedtestData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class OoklaSpeedTestExecutorMock implements OoklaSpeedTestExecutor {
         this.ooklaOutputParser = ooklaOutputParser;
     }
 
-    public Optional<SpeedTestData> execute() {
+    public Optional<SpeedtestData> execute() {
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException ie) {

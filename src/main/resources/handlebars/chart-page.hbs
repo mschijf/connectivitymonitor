@@ -19,10 +19,12 @@
                 </tr>
                 <tr>
                     <td>{{>speedtest-component}}</td>
+                    <td>{{>chart-line speedgraphPerHour}}</td>
                 </tr>
             </tbody>
         </table>
         {{>chart-script graphPerMinute}}
         {{>chart-script graphPerHour}}
+        {{>chart-script speedgraphPerHour}}
     </body>
 </html>

@@ -5,7 +5,9 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.ms.raspberry.entity.PingSummary;
+import com.ms.raspberry.entity.SpeedtestData;
 import com.ms.raspberry.service.PingService;
+import com.ms.raspberry.service.SpeedtestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +26,12 @@ public class HtmlPageService {
     private static final Logger log = LoggerFactory.getLogger(HtmlPageService.class);
 
     private final PingService pingService;
+    private final SpeedtestService speedtestService;
 
     @Autowired
-    public HtmlPageService(PingService pingService) {
+    public HtmlPageService(PingService pingService, SpeedtestService speedtestService) {
         this.pingService = pingService;
+        this.speedtestService = speedtestService;
     }
 
     public String getPage() {
@@ -35,6 +39,7 @@ public class HtmlPageService {
         HashMap<String, ChartData> allCharts = new HashMap<>();
         allCharts.put("graphPerMinute", createPacketsLostPerMinuteChart());
         allCharts.put("graphPerHour", createPingTimesPerHour());
+        allCharts.put("speedgraphPerHour", createSpeedtestChart());
 
         TemplateLoader loader = new ClassPathTemplateLoader("/handlebars", ".hbs");
         Handlebars handlebars = new Handlebars(loader);
@@ -45,6 +50,28 @@ public class HtmlPageService {
             log.error("Error during creating chart page", ioe);
             return "Error during creating chart page";
         }
+    }
+
+    private ChartData createSpeedtestChart() {
+        Collection<SpeedtestData> hourResults = speedtestService.getSpeedPerHour();
+        return ChartData.newBuilder()
+                .setLabels(
+                        hourResults.stream()
+                                .map(s -> getTimeString(s.getRunDateTime()))
+                                .collect(Collectors.toCollection(ArrayList::new)))
+                .addDataSet(ChartDataSet.Type.line, "Download", "#3e95cd",
+                        (ArrayList<? extends Number>) hourResults.stream()
+                                .map(s -> bytesToMbps(s.getDownloadSpeedBytes()))
+                                .collect(Collectors.toCollection(ArrayList::new)))
+                .addDataSet(ChartDataSet.Type.line, "Upload", "#ff0000",
+                        (ArrayList<? extends Number>) hourResults.stream()
+                                .map(s -> bytesToMbps(s.getUploadSpeedBytes()))
+                                .collect(Collectors.toCollection(ArrayList::new)))
+                .build();
+    }
+
+    private Integer bytesToMbps(Integer bytes) {
+        return (bytes * 8) / 1000000;
     }
 
     private ChartData createPacketsLostPerMinuteChart() {

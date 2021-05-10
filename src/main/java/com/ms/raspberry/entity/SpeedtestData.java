@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity(name="speedtest")
-public class SpeedTestData {
+public class SpeedtestData {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "speed_id_generator")
     @SequenceGenerator(name="speed_id_generator", sequenceName = "speed_id_seq", allocationSize = 1)
@@ -31,10 +31,10 @@ public class SpeedTestData {
     @Column(name="all_output")
     private String allOutput;
 
-    public SpeedTestData() {
+    public SpeedtestData() {
     }
 
-    public SpeedTestData(LocalDateTime runDateTime, String allOutput) {
+    public SpeedtestData(LocalDateTime runDateTime, String allOutput) {
         this.runDateTime = runDateTime;
         this.allOutput = allOutput.trim();
         this.latencyMillis = null;
@@ -44,7 +44,7 @@ public class SpeedTestData {
         this.allOutput = trimAllOutput(allOutput);
     }
 
-    public SpeedTestData(LocalDateTime runDateTime, Double latencyMillis, Double jitterMillis, Integer downloadSpeedBytes, Integer uploadSpeedBytes, Double packetLoss, String allOutput) {
+    public SpeedtestData(LocalDateTime runDateTime, Double latencyMillis, Double jitterMillis, Integer downloadSpeedBytes, Integer uploadSpeedBytes, Double packetLoss, String allOutput) {
         this.runDateTime = runDateTime;
         this.latencyMillis = latencyMillis;
         this.jitterMillis = jitterMillis;
