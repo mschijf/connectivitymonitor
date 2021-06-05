@@ -28,7 +28,7 @@ spring:
     password: cmdpro!1234
 
 schedule:
-  runspeedtest:
-    cron: 0 0 * * * ?
+#  runspeedtest:
+#    cron: 0 0 * * * ?
   runping:
     cron: 0 * * * * ?
