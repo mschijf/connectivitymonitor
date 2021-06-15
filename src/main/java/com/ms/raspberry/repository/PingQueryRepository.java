@@ -11,25 +11,22 @@ public interface PingQueryRepository extends CrudRepository<PingSummary, LocalDa
     String DAY_SUMMARY_SELECT =
             "select " +
                     " date_trunc('day', run_date_time) date_time," +
-                    " coalesce(sum(packets_transmitted),0) total_transmitted, coalesce(sum(packets_received),0) total_received, " +
-                    " coalesce(min(mintime_millis),0) min_time_millis, coalesce(avg(avgtime_millis),0) avg_time_millis, " +
-                    " coalesce(max(maxtime_millis),0) max_time_millis " +
+                    " sum(packets_transmitted) total_transmitted, sum(packets_received) total_received, " +
+                    " min(mintime_millis) min_time_millis, avg(avgtime_millis) avg_time_millis, max(maxtime_millis) max_time_millis " +
                     "from cmddata.ping ";
 
     String HOUR_SUMMARY_SELECT =
             "select " +
                     " date_trunc('hour', run_date_time) date_time," +
-                    " coalesce(sum(packets_transmitted),0) total_transmitted, coalesce(sum(packets_received),0) total_received, " +
-                    " coalesce(min(mintime_millis),0) min_time_millis, coalesce(avg(avgtime_millis),0) avg_time_millis, " +
-                    " coalesce(max(maxtime_millis),0) max_time_millis " +
+                    " sum(packets_transmitted) total_transmitted, sum(packets_received) total_received, " +
+                    " min(mintime_millis) min_time_millis, avg(avgtime_millis) avg_time_millis, max(maxtime_millis) max_time_millis " +
                     "from cmddata.ping ";
 
     String MINUTE_SUMMARY_SELECT =
             "select " +
                     " date_trunc('minute', run_date_time) date_time," +
-                    " coalesce(packets_transmitted,0) total_transmitted, coalesce(packets_received,0) total_received, " +
-                    " coalesce(mintime_millis,0) min_time_millis, coalesce(avgtime_millis,0) avg_time_millis, " +
-                    " coalesce(maxtime_millis,0) max_time_millis " +
+                    " packets_transmitted total_transmitted, packets_received total_received, " +
+                    " mintime_millis min_time_millis, avgtime_millis avg_time_millis, maxtime_millis max_time_millis " +
                     "from cmddata.ping ";
 
     @Query(value = DAY_SUMMARY_SELECT +
