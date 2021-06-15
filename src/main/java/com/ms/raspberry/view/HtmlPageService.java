@@ -61,11 +61,11 @@ public class HtmlPageService {
                                 .collect(Collectors.toCollection(ArrayList::new)))
                 .addDataSet(ChartDataSet.Type.line, "Download", "#3e95cd",
                         (ArrayList<? extends Number>) hourResults.stream()
-                                .map(s -> bytesToMbps(s.getDownloadSpeedBytes()))
+                                .map(s -> s!=null ? bytesToMbps(s.getDownloadSpeedBytes()) : null)
                                 .collect(Collectors.toCollection(ArrayList::new)))
                 .addDataSet(ChartDataSet.Type.line, "Upload", "#ff0000",
                         (ArrayList<? extends Number>) hourResults.stream()
-                                .map(s -> bytesToMbps(s.getUploadSpeedBytes()))
+                                .map(s -> s!=null ? bytesToMbps(s.getUploadSpeedBytes()) : null)
                                 .collect(Collectors.toCollection(ArrayList::new)))
                 .build();
     }
@@ -94,13 +94,7 @@ public class HtmlPageService {
 
     private ArrayList<Integer> getTotalPacketsMissed(Collection<PingSummary> summary) {
         return summary.stream()
-                .map(s -> (s.getTotalPacketsTransmitted() - s.getTotalPacketsReceived()))
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    private ArrayList<Integer> getMinTime(Collection<PingSummary> summary) {
-        return summary.stream()
-                .map(PingSummary::getMinTimeMillis)
+                .map(s -> s!=null ? (s.getTotalPacketsTransmitted() - s.getTotalPacketsReceived()) : null)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -110,21 +104,9 @@ public class HtmlPageService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private ArrayList<Integer> getAvgTime(Collection<PingSummary> summary) {
-        return summary.stream()
-                .map(PingSummary::getAvgTimeMillis)
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
     private ArrayList<String> getRunTime(Collection<PingSummary> summary) {
         return summary.stream()
                 .map(s -> getTimeString(s.getFromDate()))
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    private ArrayList<String> getRunDayMonth(Collection<PingSummary> summary) {
-        return summary.stream()
-                .map(s -> getDayMonthString(s.getFromDate()))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
