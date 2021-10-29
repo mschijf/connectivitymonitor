@@ -14,7 +14,7 @@ import java.util.Optional;
 public class PingExecutor {
     private static final Logger log = LoggerFactory.getLogger(PingExecutor.class);
 
-    private static final String PING_COMMAND = "ping ziggo.nl -c 4 -p 10";
+    private static final String PING_COMMAND = "ping kpn.nl -c 4 -p 10";
 
     private final CommandExecutor commandExecutor;
     private final PingOutputParser pingOutputParser;
