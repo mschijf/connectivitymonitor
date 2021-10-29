@@ -71,7 +71,7 @@ public class HtmlPageService {
     }
 
     private Integer bytesToMbps(Integer bytes) {
-        return (bytes * 8) / 1000000;
+        return (bytes == null) ? null : ((bytes * 8) / 1000000);
     }
 
     private ChartData createPacketsLostPerMinuteChart() {
