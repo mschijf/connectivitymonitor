@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@Profile("default")
+@Profile({"default", "prodview"})
 @Component
 public class OoklaSpeedTestExecutorMock implements OoklaSpeedTestExecutor {
     private final OoklaJsonParser ooklaOutputParser;

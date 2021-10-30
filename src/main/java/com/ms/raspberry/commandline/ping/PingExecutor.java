@@ -14,8 +14,6 @@ import java.util.Optional;
 public class PingExecutor {
     private static final Logger log = LoggerFactory.getLogger(PingExecutor.class);
 
-    private static final String PING_COMMAND = "ping kpn.nl -c 4 -p 10";
-
     private final CommandExecutor commandExecutor;
     private final PingOutputParser pingOutputParser;
 
@@ -26,12 +24,13 @@ public class PingExecutor {
     }
 
     public Optional<PingData> execute(String host, int count, int maxTimeSeconds) {
+        String pingCommand = "ping " + host + " -c " + count + " -p " + maxTimeSeconds;
         try {
             LocalDateTime now = LocalDateTime.now();
-            String outputLines = commandExecutor.execCommand("ping " + host + " -c " + count + " -p " + maxTimeSeconds);
+            String outputLines = commandExecutor.execCommand(pingCommand);
             return pingOutputParser.parsePingOutput(now, host, outputLines);
         } catch (Exception exception) {
-            log.error("Error while executing {}", PING_COMMAND, exception);
+            log.error("Error while executing {}", pingCommand, exception);
             return Optional.empty();
         }
     }

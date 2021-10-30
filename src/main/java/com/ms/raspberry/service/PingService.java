@@ -27,7 +27,7 @@ public class PingService {
     }
 
     public Optional<PingData> doPing() {
-        Optional<PingData> pingData = pingExecutor.execute("ziggo.nl", 50, 55);
+        Optional<PingData> pingData = pingExecutor.execute("kpn.nl", 50, 55);
         if (pingData.isEmpty())
             return pingData;
 

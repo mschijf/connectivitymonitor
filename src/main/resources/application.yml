@@ -14,8 +14,9 @@ spring:
     password: ${spring.datasource.password}
 
 schedule:
-  #  runspeedtest:
-  #    cron: 0 * * * * ?
+  # cron:  second(0-59) minute(0-59) hour(0-23) day-of-month(1-28/31) month-of-year(1-12) day-of-week(1-7)
+  runspeedtest:
+    cron: 0 */10 * * * ?
   runping:
     cron: 0 * * * * ?
 
@@ -28,7 +29,24 @@ spring:
     password: cmdpro!1234
 
 schedule:
+  # cron:  second(0-59) minute(0-59) hour(0-23) day-of-month(1-28/31) month-of-year(1-12) day-of-week(1-7)
   runspeedtest:
-    cron: 0 0 * * * ?
+    cron: 0 */10 * * * ?
   runping:
     cron: 0 * * * * ?
+
+---
+spring:
+  config.activate.on-profile: prodview
+  datasource:
+    url: jdbc:postgresql://192.168.2.19:5432/cmdpro?currentSchema=cmddata
+    username: cmdpro
+    password: cmdpro!1234
+
+schedule:
+  # cron:  second(0-59) minute(0-59) hour(0-23) day-of-month(1-28/31) month-of-year(1-12) day-of-week(1-7)
+  runspeedtest:
+    cron: 0 0 12 31 12 ?
+  runping:
+    cron: 0 0 12 31 12 ?
+
