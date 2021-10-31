@@ -30,22 +30,27 @@ public class SpeedtestService {
     public SpeedtestService(SpeedtestRepository repository, OoklaSpeedTestExecutor ooklaSpeedTestExecutor, MeterRegistry registry) {
         this.repository = repository;
         this.ooklaSpeedTestExecutor = ooklaSpeedTestExecutor;
-        gaugeDownloadSpeed = registry.gauge("speedtest.gauge.downloadSpeed", new AtomicInteger(0));
-        gaugeUploadSpeed = registry.gauge("speedtest.gauge.uploadSpeed", new AtomicInteger(0));
+        initMetrics(registry);
+    }
+
+    private void initMetrics(MeterRegistry registry) {
+        gaugeDownloadSpeed = registry.gauge("speedtest.speed.download", new AtomicInteger(0));
+        gaugeUploadSpeed = registry.gauge("speedtest.speed.upload", new AtomicInteger(0));
     }
 
     public Optional<SpeedtestData> doSpeedTest() {
-
         Optional<SpeedtestData> speedTestData = ooklaSpeedTestExecutor.execute();
+        setMetrics(speedTestData);
         if (speedTestData.isEmpty()) {
-            gaugeDownloadSpeed.set(0);
-            gaugeUploadSpeed.set(0);
             return speedTestData;
         }
-        gaugeDownloadSpeed.set(speedTestData.get().getDownloadSpeedBytes());
-        gaugeUploadSpeed.set(speedTestData.get().getUploadSpeedBytes());
         SpeedtestData savedData = repository.save(speedTestData.get());
         return Optional.of(savedData);
+    }
+
+    private void setMetrics(Optional<SpeedtestData> speedTestData) {
+        gaugeDownloadSpeed.set(speedTestData.map(SpeedtestData::getDownloadSpeedBytes).orElseGet(() -> 0));
+        gaugeUploadSpeed.set(speedTestData.map(SpeedtestData::getUploadSpeedBytes).orElseGet(() -> 0));
     }
 
     public Optional<SpeedtestData> getSpeedTestData(Integer id) {
