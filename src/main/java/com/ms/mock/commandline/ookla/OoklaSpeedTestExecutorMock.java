@@ -1,8 +1,8 @@
 package com.ms.mock.commandline.ookla;
 
-import com.ms.raspberry.commandline.ookla.OoklaJsonParser;
-import com.ms.raspberry.commandline.ookla.OoklaSpeedTestExecutor;
-import com.ms.raspberry.entity.SpeedtestData;
+import com.ms.connectivitymonitor.commandline.ookla.OoklaJsonParser;
+import com.ms.connectivitymonitor.commandline.ookla.OoklaSpeedTestExecutor;
+import com.ms.connectivitymonitor.entity.SpeedtestData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

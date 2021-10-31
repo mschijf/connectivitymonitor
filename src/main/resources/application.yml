@@ -24,7 +24,7 @@ schedule:
 spring:
   config.activate.on-profile: prod
   datasource:
-    url: jdbc:postgresql://192.168.2.19:5432/cmdpro?currentSchema=cmddata
+    url: jdbc:postgresql://localhost:5432/cmdpro?currentSchema=cmddata
     username: cmdpro
     password: cmdpro!1234
 
