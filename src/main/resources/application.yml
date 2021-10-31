@@ -13,6 +13,12 @@ spring:
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
 schedule:
   # cron:  second(0-59) minute(0-59) hour(0-23) day-of-month(1-28/31) month-of-year(1-12) day-of-week(1-7)
   runspeedtest:
