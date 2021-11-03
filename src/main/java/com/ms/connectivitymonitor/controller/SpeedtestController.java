@@ -29,11 +29,4 @@ public class SpeedtestController {
         Optional<SpeedtestData> data = speedTestService.doSpeedTest();
         return data.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
     }
-
-    @GetMapping("/speedtest/{id}")
-    @ApiOperation(value = "Fetch speedtest record", notes = "get speedtest data")
-    public ResponseEntity<SpeedtestData> getSpeedTestRecord(@PathVariable(name="id") Integer id) {
-        Optional<SpeedtestData> data = speedTestService.getSpeedTestData(id);
-        return data.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
 }

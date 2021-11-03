@@ -1,29 +1,15 @@
 package com.ms.connectivitymonitor.entity;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Table(name="ping")
-@Entity(name="ping")
 public class PingData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ping_id_generator")
-    @SequenceGenerator(name="ping_id_generator", sequenceName = "ping_id_seq", allocationSize = 1)
     private int id;
-
-    @Column(name="run_date_time")
     private LocalDateTime runDateTime;
-    @Column(name="packets_transmitted")
     private Integer packetsTransmitted;
-    @Column(name="packets_received")
     private Integer packetsReceived;
-    @Column(name="mintime_millis")
     private Integer minTimeMillis;
-    @Column(name="avgtime_millis")
     private Integer avgTimeMillis;
-    @Column(name="maxtime_millis")
     private Integer maxTimeMillis;
-    @Column(name="host")
     private String host;
 
     public PingData() {}

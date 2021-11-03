@@ -1,34 +1,15 @@
 package com.ms.connectivitymonitor.entity;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity(name="speedtest")
 public class SpeedtestData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "speed_id_generator")
-    @SequenceGenerator(name="speed_id_generator", sequenceName = "speed_id_seq", allocationSize = 1)
     private int id;
-
-    @Column(name="run_date_time")
     private LocalDateTime runDateTime;
-
-    @Column(name="latency_millis")
     private Double latencyMillis;
-
-    @Column(name="jitter_millis")
     private Double jitterMillis;
-
-    @Column(name="downloadspeed_bytes")
     private Integer downloadSpeedBytes;
-
-    @Column(name="uploadspeed_bytes")
     private Integer uploadSpeedBytes;
-
-    @Column(name="packet_loss_perc")
     private Double packetLoss;
-
-    @Column(name="all_output")
     private String allOutput;
 
     public SpeedtestData() {
