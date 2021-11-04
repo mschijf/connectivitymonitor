@@ -36,7 +36,7 @@ public class PingService {
         gaugePingAvgMs = registry.gauge("pingtime", Collections.singletonList(new ImmutableTag("level", "avg")), new AtomicInteger(0));
         counterPingPackageTransmitted = registry.counter("pingpackage", Collections.singletonList(new ImmutableTag("sendtype", "transmitted")));
         counterPingPackageReceived = registry.counter("pingpackage", Collections.singletonList(new ImmutableTag("sendtype", "received")));
-        gaugePingPackagesMissed = registry.gauge("pingpackage", Collections.singletonList(new ImmutableTag("sendtype", "missed")), new AtomicInteger(0));
+        gaugePingPackagesMissed = registry.gauge("pingpackages_missed", new AtomicInteger(0));
     }
 
     public Optional<PingData> doPing() {
