@@ -2,7 +2,6 @@ package com.ms.connectivitymonitor.service;
 
 import com.ms.connectivitymonitor.commandline.ookla.OoklaSpeedTestExecutor;
 import com.ms.connectivitymonitor.entity.SpeedtestData;
-import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,18 +11,17 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class SpeedtestService {
+    private final int MAX_RETRY_ATTEMPTS = 5;
 
     private static final Logger log = LoggerFactory.getLogger(SpeedtestService.class);
-    private OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
+    private final OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
     private AtomicInteger gaugeDownloadSpeed;
     private AtomicInteger gaugeUploadSpeed;
-
 
     @Autowired
     public SpeedtestService(OoklaSpeedTestExecutor ooklaSpeedTestExecutor, MeterRegistry registry) {
@@ -37,8 +35,17 @@ public class SpeedtestService {
     }
 
     public Optional<SpeedtestData> doSpeedTest() {
-        Optional<SpeedtestData> speedTestData = ooklaSpeedTestExecutor.execute();
+        Optional<SpeedtestData> speedTestData = receiveSpeedtestData(MAX_RETRY_ATTEMPTS);
         setMetrics(speedTestData);
+        return speedTestData;
+    }
+
+    private Optional<SpeedtestData> receiveSpeedtestData(int numberOfRetries) {
+        Optional<SpeedtestData> speedTestData = ooklaSpeedTestExecutor.execute();
+        while (speedTestData.isEmpty() && numberOfRetries > 0) {
+            speedTestData = ooklaSpeedTestExecutor.execute();
+            numberOfRetries--;
+        }
         return speedTestData;
     }
 

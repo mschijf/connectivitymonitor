@@ -22,6 +22,7 @@ public class PingService {
     private AtomicInteger gaugePingAvgMs;
     private Counter counterPingPackageTransmitted;
     private Counter counterPingPackageReceived;
+    private AtomicInteger gaugePingPackagesMissed;
 
     @Autowired
     public PingService(PingExecutor pingExecutor, MeterRegistry registry) {
@@ -35,6 +36,7 @@ public class PingService {
         gaugePingAvgMs = registry.gauge("pingtime", Collections.singletonList(new ImmutableTag("level", "avg")), new AtomicInteger(0));
         counterPingPackageTransmitted = registry.counter("pingpackage", Collections.singletonList(new ImmutableTag("sendtype", "transmitted")));
         counterPingPackageReceived = registry.counter("pingpackage", Collections.singletonList(new ImmutableTag("sendtype", "received")));
+        gaugePingPackagesMissed = registry.gauge("pingpackage", Collections.singletonList(new ImmutableTag("sendtype", "missed")), new AtomicInteger(0));
     }
 
     public Optional<PingData> doPing() {
@@ -47,8 +49,12 @@ public class PingService {
         gaugePingAvgMs.set(pingData.map(PingData::getAvgTimeMillis).orElse(0));
         gaugePingMinMs.set(pingData.map(PingData::getMinTimeMillis).orElse(0));
         gaugePingMaxMs.set(pingData.map(PingData::getMaxTimeMillis).orElse(0));
-        counterPingPackageTransmitted.increment(pingData.map(PingData::getPacketsTransmitted).orElse(0));
-        counterPingPackageReceived.increment(pingData.map(PingData::getPacketsReceived).orElse(0));
+        int packagesTransmitted = pingData.map(PingData::getPacketsTransmitted).orElse(0);
+        int packagesReceived = pingData.map(PingData::getPacketsReceived).orElse(0);
+
+        counterPingPackageTransmitted.increment(packagesTransmitted);
+        counterPingPackageReceived.increment(packagesReceived);
+        gaugePingPackagesMissed.set(packagesTransmitted - packagesReceived);
     }
 
     @Scheduled(cron = "${schedule.runping.cron:-}")
