@@ -39,11 +39,15 @@ public class SpeedtestService {
                 .builder("internetspeed")
                 .baseUnit("megabits/second")
                 .tags("direction", "upload")
+                .publishPercentiles(0.8, 0.9, 0.95)
+                .publishPercentileHistogram()
                 .register(registry);
         distibutionSummaryDownload = DistributionSummary
                 .builder("internetspeed")
                 .baseUnit("megabits/second")
                 .tags("direction", "download")
+                .publishPercentiles(0.8, 0.9, 0.95)
+                .publishPercentileHistogram()
                 .register(registry);
     }
 

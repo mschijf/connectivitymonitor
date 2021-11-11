@@ -30,7 +30,7 @@ public class OoklaJsonParser {
                             );
         } catch (Exception exception) {
             log.error("Error while parsing ookla speedtest output {}", ooklaOutput);
-            return Optional.of(new SpeedtestData(LocalDateTime.now(), ooklaOutput));
+            return Optional.empty();
         }
     }
 
