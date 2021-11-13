@@ -3,14 +3,12 @@ package com.ms.connectivitymonitor.service;
 import com.ms.connectivitymonitor.commandline.ping.PingExecutor;
 import com.ms.connectivitymonitor.entity.PingData;
 import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -33,18 +31,22 @@ public class PingService {
     }
 
     public Optional<PingData> doPing() {
-        Optional<PingData> pingData = pingExecutor.execute("kpn.nl", 1, 2);
-        setMetrics(pingData);
+        int numberOfPings = 1;
+        Optional<PingData> pingData = pingExecutor.execute("kpn.nl", numberOfPings, numberOfPings + 1);
+        setMetrics(pingData, numberOfPings);
         return pingData;
     }
 
-    private void setMetrics(Optional<PingData> pingData) {
+    private void setMetrics(Optional<PingData> pingData, int numberOfPings) {
         if (pingData.isEmpty()) {
-            counterPingPackagesMissed.increment(1);
-            pingTimer.record(0, TimeUnit.MILLISECONDS);
+            counterPingPackagesMissed.increment(numberOfPings);
         } else {
-            counterPingPackagesMissed.increment(1 - pingData.get().getPacketsReceived());
-            pingTimer.record(pingData.get().getMaxTimeMillis(), TimeUnit.MILLISECONDS);
+            if (pingData.get().getPacketsReceived() != null)
+                counterPingPackagesMissed.increment(numberOfPings - pingData.get().getPacketsReceived());
+            else
+                counterPingPackagesMissed.increment(numberOfPings);
+            if (pingData.get().getMaxTimeMillis() != null)
+                pingTimer.record(pingData.get().getMaxTimeMillis(), TimeUnit.MILLISECONDS);
         }
     }
 
