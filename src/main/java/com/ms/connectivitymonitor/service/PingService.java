@@ -18,8 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class PingService {
 
     PingExecutor pingExecutor;
-    private Counter counterPingPackageTransmitted;
-    private Counter counterPingPackageReceived;
+    private Counter counterPingPackagesMissed;
     private Timer pingTimer;
 
     @Autowired
@@ -29,8 +28,7 @@ public class PingService {
     }
 
     private void initMetrics(MeterRegistry registry) {
-        counterPingPackageTransmitted = registry.counter("pingpackage", Collections.singletonList(new ImmutableTag("sendtype", "transmitted")));
-        counterPingPackageReceived = registry.counter("pingpackage", Collections.singletonList(new ImmutableTag("sendtype", "received")));
+        counterPingPackagesMissed = registry.counter("pingpackagesMissed");
         pingTimer = Timer.builder("pingtime").register(registry);
     }
 
@@ -41,13 +39,16 @@ public class PingService {
     }
 
     private void setMetrics(Optional<PingData> pingData) {
-        counterPingPackageTransmitted.increment(pingData.map(PingData::getPacketsTransmitted).orElse(0));
-        counterPingPackageReceived.increment(pingData.map(PingData::getPacketsReceived).orElse(0));
-        pingTimer.record(pingData.map(PingData::getMaxTimeMillis).orElse(0), TimeUnit.MILLISECONDS);
+        if (pingData.isEmpty()) {
+            counterPingPackagesMissed.increment(1);
+            pingTimer.record(0, TimeUnit.MILLISECONDS);
+        } else {
+            counterPingPackagesMissed.increment(1 - pingData.get().getPacketsReceived());
+            pingTimer.record(pingData.get().getMaxTimeMillis(), TimeUnit.MILLISECONDS);
+        }
     }
 
-//    @Scheduled(cron = "${schedule.runping.cron:-}")
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 500)
     public void scheduleFixedDelayTask() {
         doPing();
     }
