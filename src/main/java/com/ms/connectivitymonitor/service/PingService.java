@@ -33,21 +33,13 @@ public class PingService {
     public Optional<PingData> doPing() {
         int numberOfPings = 1;
         Optional<PingData> pingData = pingExecutor.execute("kpn.nl", numberOfPings, numberOfPings + 1);
-        setMetrics(pingData, numberOfPings);
-        return pingData;
-    }
-
-    private void setMetrics(Optional<PingData> pingData, int numberOfPings) {
-        if (pingData.isEmpty()) {
-            counterPingPackagesMissed.increment(numberOfPings);
+        if (pingData.isPresent()) {
+            counterPingPackagesMissed.increment(numberOfPings - pingData.get().getPacketsReceived());
+            pingTimer.record(pingData.get().getMaxTimeMillis(), TimeUnit.MILLISECONDS);
         } else {
-            if (pingData.get().getPacketsReceived() != null)
-                counterPingPackagesMissed.increment(numberOfPings - pingData.get().getPacketsReceived());
-            else
-                counterPingPackagesMissed.increment(numberOfPings);
-            if (pingData.get().getMaxTimeMillis() != null)
-                pingTimer.record(pingData.get().getMaxTimeMillis(), TimeUnit.MILLISECONDS);
+            counterPingPackagesMissed.increment(numberOfPings);
         }
+        return pingData;
     }
 
     @Scheduled(fixedDelay = 500)

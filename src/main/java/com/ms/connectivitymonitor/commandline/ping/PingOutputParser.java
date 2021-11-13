@@ -22,24 +22,24 @@ public class PingOutputParser {
         Integer max  = null;
         Integer transmitted = null;
         Integer received = null;
-        if (matcherSummary.find() && matcherSummary.groupCount() == 4) {
-            min = parseToIntegerOrNull(matcherSummary.group(1).trim());
-            avg = parseToIntegerOrNull(matcherSummary.group(2).trim());
-            max = parseToIntegerOrNull(matcherSummary.group(3).trim());
+        try {
+            if (matcherSummary.find() && matcherSummary.groupCount() == 4) {
+                min = parseToInteger(matcherSummary.group(1).trim());
+                avg = parseToInteger(matcherSummary.group(2).trim());
+                max = parseToInteger(matcherSummary.group(3).trim());
+            }
+            if (matcherPackets.find() && matcherPackets.groupCount() == 2) {
+                transmitted = parseToInteger(matcherPackets.group(1).trim());
+                received = parseToInteger(matcherPackets.group(2).trim());
+            }
+            return Optional.of(new PingData(startTime, transmitted, received, min, avg, max, host));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
         }
-        if (matcherPackets.find() && matcherPackets.groupCount() == 2) {
-            transmitted = parseToIntegerOrNull(matcherPackets.group(1).trim());
-            received = parseToIntegerOrNull(matcherPackets.group(2).trim());
-        }
-        return Optional.of(new PingData(startTime, transmitted, received, min, avg, max, host));
     }
 
-    private static Integer parseToIntegerOrNull(String s) throws NullPointerException {
-        try {
-            double d = Double.parseDouble(s);
-            return (int) Math.round(d);
-        } catch (Exception e) {
-            return null;
-        }
+    private static Integer parseToInteger(String s) throws NumberFormatException {
+        double d = Double.parseDouble(s);
+        return (int) Math.round(d);
     }
 }

@@ -3,7 +3,6 @@ package com.ms.connectivitymonitor.entity;
 import java.time.LocalDateTime;
 
 public class PingData {
-    private int id;
     private LocalDateTime runDateTime;
     private Integer packetsTransmitted;
     private Integer packetsReceived;
@@ -22,10 +21,6 @@ public class PingData {
         this.avgTimeMillis = avgTimeMillis;
         this.maxTimeMillis = maxTimeMillis;
         this.host = host;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public LocalDateTime getRunDateTime() {
