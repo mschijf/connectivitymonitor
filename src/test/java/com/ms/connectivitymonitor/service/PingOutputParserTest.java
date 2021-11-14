@@ -39,6 +39,7 @@ class PingOutputParserTest {
             "\n" +
             "--- bol.com ping statistics ---\n" +
             "4 packets transmitted, 0 received, 100% packet loss, time 3051ms\n" +
+            "rtt min/avg/max/mdev = 16.650/34.758/63.799/17.706 ms\n" +
             "\n";
 
     private static final String pingTextNoConnection2 =
@@ -48,8 +49,8 @@ class PingOutputParserTest {
             "From r2-s2.t2.rtm0.transip.net (136.144.192.135) icmp_seq=3 Time to live exceeded\n" +
             "\n" +
             "--- zigo.nl ping statistics ---\n" +
-            "4 packets transmitted, 0 received, +3 errors, 100% packet loss, time 3005ms\n";
-
+            "4 packets transmitted, 0 received, +3 errors, 100% packet loss, time 3005ms\n" +
+            "rtt min/avg/max/mdev = 16.650/34.758/63.799/17.706 ms\n";
 
     PingOutputParser pingOutputParser;
     LocalDateTime now;
@@ -89,9 +90,9 @@ class PingOutputParserTest {
         PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextNoConnection).orElse(new PingData());
         assertEquals(4, dataToTest.getPacketsTransmitted());
         assertEquals(0, dataToTest.getPacketsReceived());
-        assertNull(dataToTest.getMinTimeMillis());
-        assertNull(dataToTest.getAvgTimeMillis());
-        assertNull(dataToTest.getMaxTimeMillis());
+        assertEquals(17, dataToTest.getMinTimeMillis());
+        assertEquals(35, dataToTest.getAvgTimeMillis());
+        assertEquals(64, dataToTest.getMaxTimeMillis());
         assertEquals("dummy", dataToTest.getHost());
         assertEquals(now, dataToTest.getRunDateTime());
     }
@@ -101,9 +102,9 @@ class PingOutputParserTest {
         PingData dataToTest = pingOutputParser.parsePingOutput(now, "dummy", pingTextNoConnection2).orElse(new PingData());
         assertEquals(4, dataToTest.getPacketsTransmitted());
         assertEquals(0, dataToTest.getPacketsReceived());
-        assertNull(dataToTest.getMinTimeMillis());
-        assertNull(dataToTest.getAvgTimeMillis());
-        assertNull(dataToTest.getMaxTimeMillis());
+        assertEquals(17, dataToTest.getMinTimeMillis());
+        assertEquals(35, dataToTest.getAvgTimeMillis());
+        assertEquals(64, dataToTest.getMaxTimeMillis());
         assertEquals("dummy", dataToTest.getHost());
         assertEquals(now, dataToTest.getRunDateTime());
     }
