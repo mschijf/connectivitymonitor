@@ -22,19 +22,28 @@ public class PingOutputParser {
         Matcher matcherPackets = patternPackets.matcher(pingOutput);
 
         try {
-            if (matcherSummary.find() && matcherSummary.groupCount() == 4 && matcherPackets.find() && matcherPackets.groupCount() == 2) {
-                int min = parseToInteger(matcherSummary.group(1).trim());
-                int avg = parseToInteger(matcherSummary.group(2).trim());
-                int max = parseToInteger(matcherSummary.group(3).trim());
-                int transmitted = parseToInteger(matcherPackets.group(1).trim());
-                int received = parseToInteger(matcherPackets.group(2).trim());
-                return Optional.of(new PingData(startTime, transmitted, received, min, avg, max, host));
+            int transmitted = 0;
+            int received = 0;
+            int min = 0;
+            int avg = 0;
+            int max = 0;
+            if (matcherPackets.find() && matcherPackets.groupCount() == 2) {
+                transmitted = parseToInteger(matcherPackets.group(1).trim());
+                received = parseToInteger(matcherPackets.group(2).trim());
             } else {
-                log.error("Error while parsing {}", pingOutput);
+                log.warn("Unexpected result while parsing {}", pingOutput);
                 return Optional.empty();
             }
+            if (matcherSummary.find() && matcherSummary.groupCount() == 4) {
+                min = parseToInteger(matcherSummary.group(1).trim());
+                avg = parseToInteger(matcherSummary.group(2).trim());
+                max = parseToInteger(matcherSummary.group(3).trim());
+            } else {
+                log.warn("Unexpected result while parsing {}", pingOutput);
+            }
+            return Optional.of(new PingData(startTime, transmitted, received, min, avg, max, host));
         } catch (NumberFormatException e) {
-            log.error("Error while formatting to integer {}", pingOutput, e);
+            log.error("Cannot format to integer {}", pingOutput, e);
             return Optional.empty();
         }
     }
