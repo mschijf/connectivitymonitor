@@ -22,11 +22,8 @@ public class PingOutputParser {
         Matcher matcherPackets = patternPackets.matcher(pingOutput);
 
         try {
-            int transmitted = 0;
-            int received = 0;
-            int min = 0;
-            int avg = 0;
-            int max = 0;
+            int transmitted;
+            int received;
             if (matcherPackets.find() && matcherPackets.groupCount() == 2) {
                 transmitted = parseToInteger(matcherPackets.group(1).trim());
                 received = parseToInteger(matcherPackets.group(2).trim());
@@ -34,12 +31,13 @@ public class PingOutputParser {
                 log.warn("Unexpected result while parsing {}", pingOutput);
                 return Optional.empty();
             }
+            int min = 0;
+            int avg = 0;
+            int max = 0;
             if (matcherSummary.find() && matcherSummary.groupCount() == 4) {
                 min = parseToInteger(matcherSummary.group(1).trim());
                 avg = parseToInteger(matcherSummary.group(2).trim());
                 max = parseToInteger(matcherSummary.group(3).trim());
-            } else {
-                log.warn("Unexpected result while parsing {}", pingOutput);
             }
             return Optional.of(new PingData(startTime, transmitted, received, min, avg, max, host));
         } catch (NumberFormatException e) {
