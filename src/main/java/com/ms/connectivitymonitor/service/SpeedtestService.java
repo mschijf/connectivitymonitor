@@ -25,8 +25,6 @@ public class SpeedtestService {
     private final OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
     private Lazy<AtomicInteger> gaugeDownloadSpeed;
     private Lazy<AtomicInteger> gaugeUploadSpeed;
-    private Lazy<DistributionSummary> distibutionSummaryUpload;
-    private Lazy<DistributionSummary> distibutionSummaryDownload;
     private SpeedtestData lastSpeedtestResult = null;
 
     @Autowired
@@ -46,30 +44,6 @@ public class SpeedtestService {
             @Override
             protected AtomicInteger init() {
                 return meterRegistry.gauge("speedtest_speed_download", new AtomicInteger(0));
-            }
-        };
-        distibutionSummaryUpload = new Lazy<>() {
-            @Override
-            protected DistributionSummary init() {
-                return DistributionSummary
-                        .builder("internetspeed")
-                        .baseUnit("megabits/second")
-                        .tags("direction", "upload")
-                        .publishPercentiles(0.8, 0.9, 0.95)
-                        .publishPercentileHistogram()
-                        .register(meterRegistry);
-            }
-        };
-        distibutionSummaryDownload = new Lazy<>() {
-            @Override
-            protected DistributionSummary init() {
-                return DistributionSummary
-                        .builder("internetspeed")
-                        .baseUnit("megabits/second")
-                        .tags("direction", "download")
-                        .publishPercentiles(0.8, 0.9, 0.95)
-                        .publishPercentileHistogram()
-                        .register(meterRegistry);
             }
         };
     }
@@ -119,8 +93,6 @@ public class SpeedtestService {
     private void setMetrics(SpeedtestData speedTestData) {
         gaugeDownloadSpeed.get().set(speedTestData.getDownloadSpeedBytes());
         gaugeUploadSpeed.get().set(speedTestData.getUploadSpeedBytes());
-        distibutionSummaryUpload.get().record(bytesToMBits(speedTestData.getUploadSpeedBytes()));
-        distibutionSummaryDownload.get().record(bytesToMBits(speedTestData.getDownloadSpeedBytes()));
     }
 
     private int bytesToMBits(int nBytes) {
