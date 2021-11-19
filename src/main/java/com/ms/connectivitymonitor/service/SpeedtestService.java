@@ -19,13 +19,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class SpeedtestService {
     private static final Logger log = LoggerFactory.getLogger(SpeedtestService.class);
-    private final int MAX_RETRY_ATTEMPTS = 5;
+    private static final int MAX_RETRY_ATTEMPTS = 5;
+    private static final double DECREASE_RATE = 0.8;
 
     private final OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
     private Lazy<AtomicInteger> gaugeDownloadSpeed;
     private Lazy<AtomicInteger> gaugeUploadSpeed;
     private Lazy<DistributionSummary> distibutionSummaryUpload;
     private Lazy<DistributionSummary> distibutionSummaryDownload;
+    private SpeedtestData lastSpeedtestResult = null;
 
     @Autowired
     public SpeedtestService(OoklaSpeedTestExecutor ooklaSpeedTestExecutor, MeterRegistry meterRegistry) {
@@ -34,19 +36,19 @@ public class SpeedtestService {
     }
 
     private void initMetrics(MeterRegistry meterRegistry) {
-        gaugeUploadSpeed = new Lazy<AtomicInteger>() {
+        gaugeUploadSpeed = new Lazy<>() {
             @Override
             protected AtomicInteger init() {
                 return meterRegistry.gauge("speedtest_speed_upload", new AtomicInteger(0));
             }
         };
-        gaugeDownloadSpeed = new Lazy<AtomicInteger>() {
+        gaugeDownloadSpeed = new Lazy<>() {
             @Override
             protected AtomicInteger init() {
                 return meterRegistry.gauge("speedtest_speed_download", new AtomicInteger(0));
             }
         };
-        distibutionSummaryUpload = new Lazy<DistributionSummary>() {
+        distibutionSummaryUpload = new Lazy<>() {
             @Override
             protected DistributionSummary init() {
                 return DistributionSummary
@@ -58,7 +60,7 @@ public class SpeedtestService {
                         .register(meterRegistry);
             }
         };
-        distibutionSummaryDownload = new Lazy<DistributionSummary>() {
+        distibutionSummaryDownload = new Lazy<>() {
             @Override
             protected DistributionSummary init() {
                 return DistributionSummary
@@ -73,27 +75,52 @@ public class SpeedtestService {
     }
 
     public Optional<SpeedtestData> doSpeedTest() {
-        Optional<SpeedtestData> speedTestData = receiveSpeedtestData();
-        setMetrics(speedTestData);
-        return speedTestData;
+        Optional<SpeedtestData> speedtestData = receiveSpeedtestData();
+        if (speedtestData.isPresent()) {
+            lastSpeedtestResult = verifiedResult(speedtestData.get());
+            setMetrics(lastSpeedtestResult);
+            return Optional.of(lastSpeedtestResult);
+        }
+        return speedtestData;
+    }
+
+    private SpeedtestData verifiedResult(SpeedtestData speedtestData) {
+        if (recheckSpeedtestDataNecessary(speedtestData)) {
+            log.warn("Drop of {}% in downloadspeed. Let's do an extra check", DECREASE_RATE*100);
+            Optional<SpeedtestData> speedtestDataRetry = receiveSpeedtestData();
+            return speedtestDataRetry.orElse(speedtestData);
+        } else {
+            return speedtestData;
+        }
     }
 
     private Optional<SpeedtestData> receiveSpeedtestData() {
-        Optional<SpeedtestData> speedTestData = ooklaSpeedTestExecutor.execute();
+        Optional<SpeedtestData> speedtestData = ooklaSpeedTestExecutor.execute();
         int numberOfRetries = 0;
-        while (speedTestData.isEmpty() && numberOfRetries < MAX_RETRY_ATTEMPTS) {
+        while (speedtestData.isEmpty() && numberOfRetries < MAX_RETRY_ATTEMPTS) {
             numberOfRetries++;
             log.warn("Retry to fetch speedTest necessary. Retry attempt {} of {}", numberOfRetries, MAX_RETRY_ATTEMPTS);
-            speedTestData = ooklaSpeedTestExecutor.execute();
+            speedtestData = ooklaSpeedTestExecutor.execute();
         }
-        return speedTestData;
+        return speedtestData;
     }
 
-    private void setMetrics(Optional<SpeedtestData> speedTestData) {
-        gaugeDownloadSpeed.get().set(speedTestData.map(SpeedtestData::getDownloadSpeedBytes).orElse(0));
-        gaugeUploadSpeed.get().set(speedTestData.map(SpeedtestData::getUploadSpeedBytes).orElse(0));
-        distibutionSummaryUpload.get().record(bytesToMBits(speedTestData.map(SpeedtestData::getUploadSpeedBytes).orElse(0)));
-        distibutionSummaryDownload.get().record(bytesToMBits(speedTestData.map(SpeedtestData::getDownloadSpeedBytes).orElse(0)));
+
+    private boolean recheckSpeedtestDataNecessary(SpeedtestData currentSpeedtestData) {
+        if (lastSpeedtestResult == null) {
+            return false;
+        }
+        int lastDownloadBytes = lastSpeedtestResult.getDownloadSpeedBytes();
+        int currentDownloadBytes = currentSpeedtestData.getDownloadSpeedBytes();
+        return ((double)currentDownloadBytes / (double)lastDownloadBytes) < DECREASE_RATE;
+    }
+
+
+    private void setMetrics(SpeedtestData speedTestData) {
+        gaugeDownloadSpeed.get().set(speedTestData.getDownloadSpeedBytes());
+        gaugeUploadSpeed.get().set(speedTestData.getUploadSpeedBytes());
+        distibutionSummaryUpload.get().record(bytesToMBits(speedTestData.getUploadSpeedBytes()));
+        distibutionSummaryDownload.get().record(bytesToMBits(speedTestData.getDownloadSpeedBytes()));
     }
 
     private int bytesToMBits(int nBytes) {
