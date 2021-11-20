@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class PingService {
 
-    private PingExecutor pingExecutor;
+    private final PingExecutor pingExecutor;
     private Lazy<Counter> counterPingPackagesMissed;
     private Lazy<Timer> pingTimer;
 
@@ -34,13 +34,12 @@ public class PingService {
     }
 
     private void initMetrics(MeterRegistry meterRegistry) {
-        counterPingPackagesMissed = new Lazy<Counter>() {
+        counterPingPackagesMissed = new Lazy<>() {
             @Override
-            protected Counter init() {
-                return meterRegistry.counter("pingpackagesMissed");
+            protected Counter init() {return meterRegistry.counter("pingpackagesMissed");
             }
         };
-        pingTimer = new Lazy<Timer>() {
+        pingTimer = new Lazy<>() {
             @Override
             protected Timer init() {
                 return Timer.builder("pingtime").register(meterRegistry);

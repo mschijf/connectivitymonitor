@@ -60,7 +60,7 @@ public class SpeedtestService {
 
     private SpeedtestData verifiedResult(SpeedtestData speedtestData) {
         if (recheckSpeedtestDataNecessary(speedtestData)) {
-            log.warn("Drop of {}% in downloadspeed. Let's do an extra check", DECREASE_RATE*100);
+            log.warn("Drop of {}% in downloadspeed (= {}). Let's do an extra check", DECREASE_RATE*100, speedtestData.getDonwloadSpeedMbits());
             Optional<SpeedtestData> speedtestDataRetry = receiveSpeedtestData();
             return speedtestDataRetry.orElse(speedtestData);
         } else {
@@ -95,9 +95,6 @@ public class SpeedtestService {
         gaugeUploadSpeed.get().set(speedTestData.getUploadSpeedBytes());
     }
 
-    private int bytesToMBits(int nBytes) {
-        return nBytes * 8 / 1000000;
-    }
 
     @Scheduled(cron = "${schedule.runspeedtest.cron:-}")
     public void scheduleFixedDelayTask() {

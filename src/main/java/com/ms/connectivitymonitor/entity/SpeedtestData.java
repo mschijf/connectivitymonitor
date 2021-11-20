@@ -60,8 +60,16 @@ public class SpeedtestData {
         return downloadSpeedBytes;
     }
 
+    public Integer getDonwloadSpeedMbits() {
+        return downloadSpeedBytes == null ? null : bytesToMBits(downloadSpeedBytes);
+    }
+
     public Integer getUploadSpeedBytes() {
         return uploadSpeedBytes;
+    }
+
+    public Integer getUploadSpeedMbits() {
+        return uploadSpeedBytes == null ? null : bytesToMBits(uploadSpeedBytes);
     }
 
     public Double getPacketLoss() {
@@ -71,4 +79,9 @@ public class SpeedtestData {
     public String getAllOutput() {
         return allOutput;
     }
+
+    private int bytesToMBits(int nBytes) {
+        return nBytes * 8 / 1000000;
+    }
+
 }
