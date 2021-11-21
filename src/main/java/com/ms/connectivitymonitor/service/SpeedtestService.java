@@ -52,7 +52,7 @@ public class SpeedtestService {
         if (speedtestData.isPresent()) {
             lastSpeedtestResult = verifiedResult(speedtestData.get());
             setMetrics(lastSpeedtestResult);
-            log.info("Speedtest successfull. Downloadspeed: {}. Uploadspeed: {}", lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
+            log.info("Speedtest successful. Downloadspeed: {}. Uploadspeed: {}", lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
             return Optional.of(lastSpeedtestResult);
         } else {
             log.info("Speedtest not successfull");

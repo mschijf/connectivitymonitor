@@ -37,9 +37,9 @@ public class PingService {
 
         if (++countExecuted % 50 == 0) {
             if (pingData.isPresent()) {
-                log.info("Run another 100 pings. Last ping: {}ms ", pingData.get().getMaxTimeMillis());
+                log.info("Run another 50 pings. Last ping: {}ms ", pingData.get().getMaxTimeMillis());
             } else {
-                log.info("Run another 100 pings. Last ping not succesfull");
+                log.info("Run another 50 pings. Last ping not succesfull");
             }
         }
 
