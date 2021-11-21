@@ -1,0 +1,1 @@
+XXXXXXX      src/main/resources/banner.txt: ONE LINE SPRINGBOOT BANNER       XXXXXXX

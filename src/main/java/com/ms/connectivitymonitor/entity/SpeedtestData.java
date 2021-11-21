@@ -60,7 +60,7 @@ public class SpeedtestData {
         return downloadSpeedBytes;
     }
 
-    public Integer getDonwloadSpeedMbits() {
+    public Integer getDownloadSpeedMbits() {
         return downloadSpeedBytes == null ? null : bytesToMBits(downloadSpeedBytes);
     }
 

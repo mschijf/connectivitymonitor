@@ -6,6 +6,8 @@ import com.ms.tools.Lazy;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,10 +17,12 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class PingService {
+    private static final Logger log = LoggerFactory.getLogger(PingService.class);
 
     private final PingExecutor pingExecutor;
     private Lazy<Counter> counterPingPackagesMissed;
     private Lazy<Timer> pingTimer;
+    private int countExecuted = 0;
 
     @Autowired
     public PingService(PingExecutor pingExecutor, MeterRegistry meterRegistry) {
@@ -30,6 +34,15 @@ public class PingService {
         int numberOfPings = 1;
         Optional<PingData> pingData = pingExecutor.execute("kpn.nl", numberOfPings, numberOfPings + 1);
         setMetrics(pingData, numberOfPings);
+
+        if (++countExecuted % 50 == 0) {
+            if (pingData.isPresent()) {
+                log.info("Run another 100 pings. Last ping: {}ms ", pingData.get().getMaxTimeMillis());
+            } else {
+                log.info("Run another 100 pings. Last ping not succesfull");
+            }
+        }
+
         return pingData;
     }
 

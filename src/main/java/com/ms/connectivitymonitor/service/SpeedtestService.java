@@ -3,7 +3,6 @@ package com.ms.connectivitymonitor.service;
 import com.ms.connectivitymonitor.commandline.ookla.OoklaSpeedTestExecutor;
 import com.ms.connectivitymonitor.entity.SpeedtestData;
 import com.ms.tools.Lazy;
-import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,14 +52,17 @@ public class SpeedtestService {
         if (speedtestData.isPresent()) {
             lastSpeedtestResult = verifiedResult(speedtestData.get());
             setMetrics(lastSpeedtestResult);
+            log.info("Speedtest successfull. Downloadspeed: {}. Uploadspeed: {}", lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
             return Optional.of(lastSpeedtestResult);
+        } else {
+            log.info("Speedtest not successfull");
         }
         return speedtestData;
     }
 
     private SpeedtestData verifiedResult(SpeedtestData speedtestData) {
         if (recheckSpeedtestDataNecessary(speedtestData)) {
-            log.warn("Drop of {}% in downloadspeed (= {}). Let's do an extra check", DECREASE_RATE*100, speedtestData.getDonwloadSpeedMbits());
+            log.warn("Drop of {}% in downloadspeed (= {}). Let's do an extra check", DECREASE_RATE*100, speedtestData.getDownloadSpeedMbits());
             Optional<SpeedtestData> speedtestDataRetry = receiveSpeedtestData();
             return speedtestDataRetry.orElse(speedtestData);
         } else {
@@ -100,7 +102,7 @@ public class SpeedtestService {
     public void scheduleFixedDelayTask() {
         Instant start = Instant.now();
         doSpeedTest();
-        log.debug("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis()/1000.0);
+        log.info("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis()/1000.0);
     }
 }
 
