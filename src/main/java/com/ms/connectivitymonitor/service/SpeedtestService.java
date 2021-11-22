@@ -55,7 +55,7 @@ public class SpeedtestService {
             log.info("Speedtest successful. Downloadspeed: {}. Uploadspeed: {}", lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
             return Optional.of(lastSpeedtestResult);
         } else {
-            log.info("Speedtest not successfull");
+            log.error("Speedtest not successfull");
         }
         return speedtestData;
     }

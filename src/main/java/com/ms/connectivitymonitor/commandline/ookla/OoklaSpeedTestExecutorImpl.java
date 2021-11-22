@@ -31,7 +31,7 @@ public class OoklaSpeedTestExecutorImpl implements OoklaSpeedTestExecutor {
             String outputLines = commandExecutor.execCommand(CLI_COMMAND);
             return ooklaOutputParser.ooklaOutputToSpeedTestData(outputLines);
         } catch (Exception exception) {
-            log.error("Error while executing {}", CLI_COMMAND, exception);
+            log.warn("Error while executing {}", CLI_COMMAND, exception);
             return Optional.empty();
         }
     }
