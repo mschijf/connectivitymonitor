@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SpeedtestService {
     private static final Logger log = LoggerFactory.getLogger(SpeedtestService.class);
     private static final int MAX_RETRY_ATTEMPTS = 5;
-    private static final double DECREASE_RATE = 0.8;
+    private static final double DECREASE_RATE = 0.85;
 
     private final OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
     private Lazy<AtomicInteger> gaugeDownloadSpeed;
@@ -52,7 +52,8 @@ public class SpeedtestService {
         if (speedtestData.isPresent()) {
             lastSpeedtestResult = verifiedResult(speedtestData.get());
             setMetrics(lastSpeedtestResult);
-            log.info("Speedtest successful. Downloadspeed: {}. Uploadspeed: {}", lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
+            log.info("Speedtest successful. Host: {}, Downloadspeed: {}, Uploadspeed: {}",
+                    lastSpeedtestResult.getServerName(), lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
             return Optional.of(lastSpeedtestResult);
         } else {
             log.error("Speedtest not successfull");
@@ -62,7 +63,8 @@ public class SpeedtestService {
 
     private SpeedtestData verifiedResult(SpeedtestData speedtestData) {
         if (recheckSpeedtestDataNecessary(speedtestData)) {
-            log.warn("Drop of {}% in downloadspeed (= {}). Let's do an extra check", DECREASE_RATE*100, speedtestData.getDownloadSpeedMbits());
+            log.warn("Drop in speed of {}%. Downloadspeed = {}, uploadspeed = {}, server: {}.  Let's do an extra check",
+                    DECREASE_RATE*100, speedtestData.getDownloadSpeedMbits(), speedtestData.getUploadSpeedMbits(), speedtestData.getServerName());
             Optional<SpeedtestData> speedtestDataRetry = receiveSpeedtestData();
             return speedtestDataRetry.orElse(speedtestData);
         } else {
@@ -86,11 +88,20 @@ public class SpeedtestService {
         if (lastSpeedtestResult == null) {
             return false;
         }
-        int lastDownloadBytes = lastSpeedtestResult.getDownloadSpeedBytes();
-        int currentDownloadBytes = currentSpeedtestData.getDownloadSpeedBytes();
-        return ((double)currentDownloadBytes / (double)lastDownloadBytes) < DECREASE_RATE;
+        return downloadSpeedDropped(currentSpeedtestData) || uploadSpeedDropped(currentSpeedtestData);
     }
 
+    private boolean downloadSpeedDropped(SpeedtestData currentSpeedtestData) {
+        int lastDownloadBytes = lastSpeedtestResult.getDownloadSpeedBytes();
+        int currentDownloadBytes = currentSpeedtestData.getDownloadSpeedBytes();
+        return (((double)currentDownloadBytes / (double)lastDownloadBytes) < DECREASE_RATE);
+    }
+
+    private boolean uploadSpeedDropped(SpeedtestData currentSpeedtestData) {
+        int lastUploadBytes = lastSpeedtestResult.getUploadSpeedBytes();
+        int currentUploadBytes = currentSpeedtestData.getUploadSpeedBytes();
+        return (((double)currentUploadBytes / (double)lastUploadBytes) < DECREASE_RATE);
+    }
 
     private void setMetrics(SpeedtestData speedTestData) {
         gaugeDownloadSpeed.get().set(speedTestData.getDownloadSpeedBytes());

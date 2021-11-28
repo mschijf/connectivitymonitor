@@ -26,6 +26,7 @@ public class OoklaJsonParser {
                             response.getDownload().getBandwidth(),
                             response.getUpload().getBandwidth(),
                             response.getPacketLoss(),
+                            response.getServer().getName(),
                             ooklaOutput)
                             );
         } catch (Exception exception) {

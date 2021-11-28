@@ -10,6 +10,7 @@ public class SpeedtestData {
     private Integer downloadSpeedBytes;
     private Integer uploadSpeedBytes;
     private Double packetLoss;
+    private String serverName;
     private String allOutput;
 
     public SpeedtestData() {
@@ -22,16 +23,18 @@ public class SpeedtestData {
         this.downloadSpeedBytes = null;
         this.uploadSpeedBytes = null;
         this.packetLoss = null;
+        this.serverName = null;
         this.allOutput = trimAllOutput(allOutput);
     }
 
-    public SpeedtestData(LocalDateTime runDateTime, Double latencyMillis, Double jitterMillis, Integer downloadSpeedBytes, Integer uploadSpeedBytes, Double packetLoss, String allOutput) {
+    public SpeedtestData(LocalDateTime runDateTime, Double latencyMillis, Double jitterMillis, Integer downloadSpeedBytes, Integer uploadSpeedBytes, Double packetLoss, String serverName, String allOutput) {
         this.runDateTime = runDateTime;
         this.latencyMillis = latencyMillis;
         this.jitterMillis = jitterMillis;
         this.downloadSpeedBytes = downloadSpeedBytes;
         this.uploadSpeedBytes = uploadSpeedBytes;
         this.packetLoss = packetLoss;
+        this.serverName = serverName;
         this.allOutput = trimAllOutput(allOutput);
     }
 
@@ -78,6 +81,10 @@ public class SpeedtestData {
 
     public String getAllOutput() {
         return allOutput;
+    }
+
+    public String getServerName() {
+        return serverName;
     }
 
     private int bytesToMBits(int nBytes) {
