@@ -15,6 +15,8 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.Math.max;
+
 @Service
 public class SpeedtestService {
     private static final Logger log = LoggerFactory.getLogger(SpeedtestService.class);
@@ -32,37 +34,28 @@ public class SpeedtestService {
         initMetrics(meterRegistry);
     }
 
-    private void initMetrics(MeterRegistry meterRegistry) {
-        gaugeUploadSpeed = new Lazy<>() {
-            @Override
-            protected AtomicInteger init() {
-                return meterRegistry.gauge("speedtest_speed_upload", new AtomicInteger(0));
-            }
-        };
-        gaugeDownloadSpeed = new Lazy<>() {
-            @Override
-            protected AtomicInteger init() {
-                return meterRegistry.gauge("speedtest_speed_download", new AtomicInteger(0));
-            }
-        };
+    @Scheduled(cron = "${schedule.runspeedtest.cron:-}")
+    private void scheduleFixedDelayTask() {
+        Instant start = Instant.now();
+        doSpeedTest();
+        log.info("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis()/1000.0);
     }
 
     public Optional<SpeedtestData> doSpeedTest() {
         Optional<SpeedtestData> speedtestData = receiveSpeedtestData();
-        if (speedtestData.isPresent()) {
-            lastSpeedtestResult = verifiedResult(speedtestData.get());
-            setMetrics(lastSpeedtestResult);
-            log.info("Speedtest successful. Host: {}, Downloadspeed: {}, Uploadspeed: {}",
-                    lastSpeedtestResult.getServerName(), lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
-            return Optional.of(lastSpeedtestResult);
-        } else {
-            log.error("Speedtest not successfull");
-        }
+        speedtestData.ifPresentOrElse(this::processResult, () -> log.error("Speedtest not successfull"));
         return speedtestData;
     }
 
+    private void processResult(SpeedtestData speedtestData) {
+        lastSpeedtestResult = verifiedResult(speedtestData);
+        setMetrics(lastSpeedtestResult, speedtestData);
+        log.info("Speedtest successful. Host: {}, Downloadspeed: {}, Uploadspeed: {}",
+                lastSpeedtestResult.getServerName(), lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
+    }
+
     private SpeedtestData verifiedResult(SpeedtestData speedtestData) {
-        if (recheckSpeedtestDataNecessary(speedtestData)) {
+        if (speedDropped(speedtestData)) {
             log.warn("Drop in speed of {}%. Downloadspeed = {}, uploadspeed = {}, server: {}.  Let's do an extra check",
                     DECREASE_RATE*100, speedtestData.getDownloadSpeedMbits(), speedtestData.getUploadSpeedMbits(), speedtestData.getServerName());
             Optional<SpeedtestData> speedtestDataRetry = receiveSpeedtestData();
@@ -83,8 +76,7 @@ public class SpeedtestService {
         return speedtestData;
     }
 
-
-    private boolean recheckSpeedtestDataNecessary(SpeedtestData currentSpeedtestData) {
+    private boolean speedDropped(SpeedtestData currentSpeedtestData) {
         if (lastSpeedtestResult == null) {
             return false;
         }
@@ -103,17 +95,24 @@ public class SpeedtestService {
         return (((double)currentUploadBytes / (double)lastUploadBytes) < DECREASE_RATE);
     }
 
-    private void setMetrics(SpeedtestData speedTestData) {
-        gaugeDownloadSpeed.get().set(speedTestData.getDownloadSpeedBytes());
-        gaugeUploadSpeed.get().set(speedTestData.getUploadSpeedBytes());
+    private void initMetrics(MeterRegistry meterRegistry) {
+        gaugeUploadSpeed = new Lazy<>() {
+            @Override
+            protected AtomicInteger init() {
+                return meterRegistry.gauge("speedtest_speed_upload", new AtomicInteger(0));
+            }
+        };
+        gaugeDownloadSpeed = new Lazy<>() {
+            @Override
+            protected AtomicInteger init() {
+                return meterRegistry.gauge("speedtest_speed_download", new AtomicInteger(0));
+            }
+        };
     }
 
-
-    @Scheduled(cron = "${schedule.runspeedtest.cron:-}")
-    public void scheduleFixedDelayTask() {
-        Instant start = Instant.now();
-        doSpeedTest();
-        log.info("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis()/1000.0);
+    private void setMetrics(SpeedtestData lastTest, SpeedtestData backup) {
+        gaugeDownloadSpeed.get().set(max(lastTest.getDownloadSpeedBytes(), backup.getDownloadSpeedBytes()));
+        gaugeUploadSpeed.get().set(max(lastTest.getUploadSpeedBytes(), backup.getUploadSpeedBytes()));
     }
 }
 

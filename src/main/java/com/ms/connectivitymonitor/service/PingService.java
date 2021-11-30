@@ -30,10 +30,15 @@ public class PingService {
         initMetrics(meterRegistry);
     }
 
+    @Scheduled(fixedDelay = 500)
+    private void scheduleFixedDelayTask() {
+        doPing();
+    }
+
     public Optional<PingData> doPing() {
         int numberOfPings = 1;
         Optional<PingData> pingData = pingExecutor.execute("kpn.nl", numberOfPings, numberOfPings + 1);
-        setMetrics(pingData, numberOfPings);
+        pingData.ifPresentOrElse(this::setMetrics, ()->setMetricsWhenMissingData(numberOfPings));
 
         if (++countExecuted % 50 == 0) {
             if (pingData.isPresent()) {
@@ -60,18 +65,13 @@ public class PingService {
         };
     }
 
-    private void setMetrics(Optional<PingData> pingData, int numberOfPings) {
-        if (pingData.isPresent()) {
-            counterPingPackagesMissed.get().increment(pingData.get().getPacketsTransmitted() - pingData.get().getPacketsReceived());
-            pingTimer.get().record(pingData.get().getMaxTimeMillis(), TimeUnit.MILLISECONDS);
-        } else {
-            counterPingPackagesMissed.get().increment(numberOfPings);
-        }
+    private void setMetrics(PingData pingData) {
+        counterPingPackagesMissed.get().increment(pingData.getPacketsTransmitted() - pingData.getPacketsReceived());
+        pingTimer.get().record(pingData.getMaxTimeMillis(), TimeUnit.MILLISECONDS);
     }
 
-    @Scheduled(fixedDelay = 500)
-    public void scheduleFixedDelayTask() {
-        doPing();
+    private void setMetricsWhenMissingData(int numberOfPings) {
+        counterPingPackagesMissed.get().increment(numberOfPings);
     }
 }
 
