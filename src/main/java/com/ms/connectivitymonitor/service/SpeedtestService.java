@@ -21,7 +21,7 @@ import static java.lang.Math.max;
 public class SpeedtestService {
     private static final Logger log = LoggerFactory.getLogger(SpeedtestService.class);
     private static final int MAX_RETRY_ATTEMPTS = 5;
-    private static final double DECREASE_RATE = 0.85;
+    private static final double DECREASE_RATE = 0.9;
 
     private final OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
     private Lazy<AtomicInteger> gaugeDownloadSpeed;
