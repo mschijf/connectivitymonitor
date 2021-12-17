@@ -40,11 +40,11 @@ public class PingService {
         Optional<PingData> pingData = pingExecutor.execute("kpn.nl", numberOfPings, numberOfPings + 1);
         pingData.ifPresentOrElse(this::setMetrics, ()->setMetricsWhenMissingData(numberOfPings));
 
-        if (++countExecuted % 50 == 0) {
+        if (++countExecuted % 500 == 0) {
             if (pingData.isPresent()) {
-                log.info("Run another 50 pings. Last ping: {}ms ", pingData.get().getMaxTimeMillis());
+                log.info("Run another 500 pings. Last ping: {}ms ", pingData.get().getMaxTimeMillis());
             } else {
-                log.info("Run another 50 pings. Last ping not succesfull");
+                log.info("Run another 500 pings. Last ping not succesfull");
             }
         }
 

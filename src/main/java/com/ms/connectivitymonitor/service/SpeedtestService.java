@@ -38,25 +38,30 @@ public class SpeedtestService {
     private void scheduleFixedDelayTask() {
         Instant start = Instant.now();
         doSpeedTest();
-        log.info("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis()/1000.0);
+        log.debug("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis()/1000.0);
     }
 
     public Optional<SpeedtestData> doSpeedTest() {
         Optional<SpeedtestData> speedtestData = receiveSpeedtestData();
-        speedtestData.ifPresentOrElse(this::processResult, () -> log.error("Speedtest not successfull"));
+        speedtestData.ifPresentOrElse(this::processResult, this::processErrorResult);
         return speedtestData;
     }
 
     private void processResult(SpeedtestData speedtestData) {
         lastSpeedtestResult = verifiedResult(speedtestData);
         setMetrics(lastSpeedtestResult, speedtestData);
-        log.info("Speedtest successful. Host: {}, Downloadspeed: {}, Uploadspeed: {}",
+        log.info("Speedtest successful. Host: {}, Download: {}, Upload: {}",
                 lastSpeedtestResult.getServerName(), lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
+    }
+
+    private void processErrorResult() {
+        noMetrics();
+        log.error("Speedtest not successfull");
     }
 
     private SpeedtestData verifiedResult(SpeedtestData speedtestData) {
         if (speedDropped(speedtestData)) {
-            log.warn("Drop in speed of {}%. Downloadspeed = {}, uploadspeed = {}, server: {}.  Let's do an extra check",
+            log.warn("Drop in speed of {}%. Download: {}, upload: {}, server: {}.",
                     DECREASE_RATE*100, speedtestData.getDownloadSpeedMbits(), speedtestData.getUploadSpeedMbits(), speedtestData.getServerName());
             Optional<SpeedtestData> speedtestDataRetry = receiveSpeedtestData();
             return speedtestDataRetry.orElse(speedtestData);
@@ -113,6 +118,11 @@ public class SpeedtestService {
     private void setMetrics(SpeedtestData lastTest, SpeedtestData backup) {
         gaugeDownloadSpeed.get().set(max(lastTest.getDownloadSpeedBytes(), backup.getDownloadSpeedBytes()));
         gaugeUploadSpeed.get().set(max(lastTest.getUploadSpeedBytes(), backup.getUploadSpeedBytes()));
+    }
+
+    private void noMetrics() {
+        gaugeDownloadSpeed.get().set(0);
+        gaugeUploadSpeed.get().set(0);
     }
 }
 
