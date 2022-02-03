@@ -30,7 +30,11 @@ public class OoklaJsonParser {
                             ooklaOutput)
                             );
         } catch (Exception exception) {
-            log.error("Error while parsing ookla speedtest output {}", ooklaOutput);
+            if (ooklaOutput.contains("Resource temporarily unavailable")) {
+                log.warn("Error while parsing ookla speedtest output {}", ooklaOutput);
+            } else {
+                log.error("Error while parsing ookla speedtest output {}", ooklaOutput);
+            }
             return Optional.empty();
         }
     }

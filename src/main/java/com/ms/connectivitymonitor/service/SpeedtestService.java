@@ -3,6 +3,7 @@ package com.ms.connectivitymonitor.service;
 import com.ms.connectivitymonitor.commandline.ookla.OoklaSpeedTestExecutor;
 import com.ms.connectivitymonitor.entity.SpeedtestData;
 import com.ms.tools.Lazy;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,10 @@ public class SpeedtestService {
     private final OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
     private Lazy<AtomicInteger> gaugeDownloadSpeed;
     private Lazy<AtomicInteger> gaugeUploadSpeed;
+
+    private Lazy<Counter> counterRetryNecessary;
+    private Lazy<Counter> counterPerformanceDropped;
+
     private SpeedtestData lastSpeedtestResult = null;
 
     @Autowired
@@ -61,7 +66,8 @@ public class SpeedtestService {
 
     private SpeedtestData verifiedResult(SpeedtestData speedtestData) {
         if (speedDropped(speedtestData)) {
-            log.warn("Drop in speed of {}%. Download: {}, upload: {}, server: {}.",
+            counterPerformanceDropped.get().increment(1);
+            log.info("Drop in speed of {}%. Download: {}, upload: {}, server: {}.",
                     DECREASE_RATE*100, speedtestData.getDownloadSpeedMbits(), speedtestData.getUploadSpeedMbits(), speedtestData.getServerName());
             Optional<SpeedtestData> speedtestDataRetry = receiveSpeedtestData();
             return speedtestDataRetry.orElse(speedtestData);
@@ -74,8 +80,9 @@ public class SpeedtestService {
         Optional<SpeedtestData> speedtestData = ooklaSpeedTestExecutor.execute();
         int numberOfRetries = 0;
         while (speedtestData.isEmpty() && numberOfRetries < MAX_RETRY_ATTEMPTS) {
+            counterRetryNecessary.get().increment(1);
             numberOfRetries++;
-            log.warn("Retry to fetch speedTest necessary. Retry attempt {} of {}", numberOfRetries, MAX_RETRY_ATTEMPTS);
+            log.info("Retry to fetch speedTest necessary. Retry attempt {} of {}", numberOfRetries, MAX_RETRY_ATTEMPTS);
             speedtestData = ooklaSpeedTestExecutor.execute();
         }
         return speedtestData;
@@ -111,6 +118,16 @@ public class SpeedtestService {
             @Override
             protected AtomicInteger init() {
                 return meterRegistry.gauge("speedtest_speed_download", new AtomicInteger(0));
+            }
+        };
+        counterRetryNecessary = new Lazy<>() {
+            @Override
+            protected Counter init() {return meterRegistry.counter("retrySpeedTest");
+            }
+        };
+        counterPerformanceDropped = new Lazy<>() {
+            @Override
+            protected Counter init() {return meterRegistry.counter("speedTestPerforamceDropped");
             }
         };
     }
