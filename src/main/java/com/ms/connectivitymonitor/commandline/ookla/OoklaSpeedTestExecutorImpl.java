@@ -15,7 +15,7 @@ import java.util.Optional;
 public class OoklaSpeedTestExecutorImpl implements OoklaSpeedTestExecutor {
     private static final Logger log = LoggerFactory.getLogger(OoklaSpeedTestExecutorImpl.class);
 
-    private static final String CLI_COMMAND = "/usr/bin/speedtest  --progress=no --format=json";
+    private static final String CLI_COMMAND_GDPR = "/usr/bin/speedtest --accept-gdpr --progress=no --format=json";
 
     private CommandExecutor commandExecutor;
     private OoklaJsonParser ooklaOutputParser;
@@ -28,10 +28,10 @@ public class OoklaSpeedTestExecutorImpl implements OoklaSpeedTestExecutor {
 
     public Optional<SpeedtestData> execute() {
         try {
-            String outputLines = commandExecutor.execCommand(CLI_COMMAND);
+            String outputLines = commandExecutor.execCommand(CLI_COMMAND_GDPR);
             return ooklaOutputParser.ooklaOutputToSpeedTestData(outputLines);
         } catch (Exception exception) {
-            log.warn("Error while executing {}", CLI_COMMAND, exception);
+            log.warn("Error while executing {}", CLI_COMMAND_GDPR, exception);
             return Optional.empty();
         }
     }
