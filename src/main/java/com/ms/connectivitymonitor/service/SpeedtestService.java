@@ -52,6 +52,11 @@ public class SpeedtestService {
         return speedtestData;
     }
 
+    private void processErrorResult() {
+        noMetrics();
+        log.error("Speedtest not successfull");
+    }
+
     private void processResult(SpeedtestData speedtestData) {
         lastSpeedtestResult = verifiedResult(speedtestData);
         setMetrics(lastSpeedtestResult, speedtestData);
@@ -59,16 +64,11 @@ public class SpeedtestService {
                 lastSpeedtestResult.getServerName(), lastSpeedtestResult.getDownloadSpeedMbits(), lastSpeedtestResult.getUploadSpeedMbits());
     }
 
-    private void processErrorResult() {
-        noMetrics();
-        log.error("Speedtest not successfull");
-    }
-
     private SpeedtestData verifiedResult(SpeedtestData speedtestData) {
         if (speedDropped(speedtestData)) {
-            counterPerformanceDropped.get().increment(1);
+            increaseMetricsPerformanceDrops();
             log.info("Drop in speed of {}%. Download: {}, upload: {}, server: {}.",
-                    DECREASE_RATE*100, speedtestData.getDownloadSpeedMbits(), speedtestData.getUploadSpeedMbits(), speedtestData.getServerName());
+                    (1-DECREASE_RATE)*100, speedtestData.getDownloadSpeedMbits(), speedtestData.getUploadSpeedMbits(), speedtestData.getServerName());
             Optional<SpeedtestData> speedtestDataRetry = receiveSpeedtestData();
             return speedtestDataRetry.orElse(speedtestData);
         } else {
@@ -80,13 +80,14 @@ public class SpeedtestService {
         Optional<SpeedtestData> speedtestData = ooklaSpeedTestExecutor.execute();
         int numberOfRetries = 0;
         while (speedtestData.isEmpty() && numberOfRetries < MAX_RETRY_ATTEMPTS) {
-            counterRetryNecessary.get().increment(1);
-            numberOfRetries++;
-            log.info("Retry to fetch speedTest necessary. Retry attempt {} of {}", numberOfRetries, MAX_RETRY_ATTEMPTS);
+            increaseMetricsRetries();
+            log.info("Retry to fetch speedTest necessary. Retry attempt {} of {}", ++numberOfRetries, MAX_RETRY_ATTEMPTS);
             speedtestData = ooklaSpeedTestExecutor.execute();
         }
         return speedtestData;
     }
+
+    //------------------------------------------------------------------------------------------------------------------
 
     private boolean speedDropped(SpeedtestData currentSpeedtestData) {
         if (lastSpeedtestResult == null) {
@@ -106,6 +107,8 @@ public class SpeedtestService {
         int currentUploadBytes = currentSpeedtestData.getUploadSpeedBytes();
         return (((double)currentUploadBytes / (double)lastUploadBytes) < DECREASE_RATE);
     }
+
+    //------------------------------------------------------------------------------------------------------------------
 
     private void initMetrics(MeterRegistry meterRegistry) {
         gaugeUploadSpeed = new Lazy<>() {
@@ -140,6 +143,14 @@ public class SpeedtestService {
     private void noMetrics() {
         gaugeDownloadSpeed.get().set(0);
         gaugeUploadSpeed.get().set(0);
+    }
+
+    private void increaseMetricsRetries() {
+        counterRetryNecessary.get().increment(1);
+    }
+
+    private void increaseMetricsPerformanceDrops() {
+        counterPerformanceDropped.get().increment(1);
     }
 }
 
