@@ -5,37 +5,44 @@ import com.ms.connectivitymonitor.entity.SpeedtestData;
 import com.ms.tools.Lazy;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Math.max;
 
 @Service
 public class SpeedtestService {
+
+
     private static final Logger log = LoggerFactory.getLogger(SpeedtestService.class);
     private static final int MAX_RETRY_ATTEMPTS = 5;
-    private static final double DECREASE_RATE = 0.9;
 
     private final OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
+    private final double performanceDropRateTreshold;
     private Lazy<AtomicInteger> gaugeDownloadSpeed;
     private Lazy<AtomicInteger> gaugeUploadSpeed;
 
     private Lazy<Counter> counterRetryNecessary;
     private Lazy<Counter> counterPerformanceDropped;
+    private Lazy<Timer> jitterTimer;
 
     private SpeedtestData lastSpeedtestResult = null;
 
     @Autowired
-    public SpeedtestService(OoklaSpeedTestExecutor ooklaSpeedTestExecutor, MeterRegistry meterRegistry) {
+    public SpeedtestService(OoklaSpeedTestExecutor ooklaSpeedTestExecutor, MeterRegistry meterRegistry, Environment env) {
         this.ooklaSpeedTestExecutor = ooklaSpeedTestExecutor;
+        this.performanceDropRateTreshold = Double.parseDouble(env.getProperty("spring.application.performanceDropRateTreshold"));
         initMetrics(meterRegistry);
     }
 
@@ -68,7 +75,7 @@ public class SpeedtestService {
         if (speedDropped(speedtestData)) {
             increaseMetricsPerformanceDrops();
             log.info("Drop in speed of {}%. Download: {}, upload: {}, server: {}.",
-                    (1-DECREASE_RATE)*100, speedtestData.getDownloadSpeedMbits(), speedtestData.getUploadSpeedMbits(), speedtestData.getServerName());
+                    performanceDropRateTreshold *100, speedtestData.getDownloadSpeedMbits(), speedtestData.getUploadSpeedMbits(), speedtestData.getServerName());
             Optional<SpeedtestData> speedtestDataRetry = receiveSpeedtestData();
             return speedtestDataRetry.orElse(speedtestData);
         } else {
@@ -99,13 +106,13 @@ public class SpeedtestService {
     private boolean downloadSpeedDropped(SpeedtestData currentSpeedtestData) {
         int lastDownloadBytes = lastSpeedtestResult.getDownloadSpeedBytes();
         int currentDownloadBytes = currentSpeedtestData.getDownloadSpeedBytes();
-        return (((double)currentDownloadBytes / (double)lastDownloadBytes) < DECREASE_RATE);
+        return (((double)currentDownloadBytes / (double)lastDownloadBytes) < (1- performanceDropRateTreshold));
     }
 
     private boolean uploadSpeedDropped(SpeedtestData currentSpeedtestData) {
         int lastUploadBytes = lastSpeedtestResult.getUploadSpeedBytes();
         int currentUploadBytes = currentSpeedtestData.getUploadSpeedBytes();
-        return (((double)currentUploadBytes / (double)lastUploadBytes) < DECREASE_RATE);
+        return (((double)currentUploadBytes / (double)lastUploadBytes) < (1- performanceDropRateTreshold));
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -133,11 +140,18 @@ public class SpeedtestService {
             protected Counter init() {return meterRegistry.counter("speedTestPerforamceDropped");
             }
         };
+        jitterTimer = new Lazy<>() {
+            @Override
+            protected Timer init() {
+                return Timer.builder("jittertime").register(meterRegistry);
+            }
+        };
     }
 
     private void setMetrics(SpeedtestData lastTest, SpeedtestData backup) {
         gaugeDownloadSpeed.get().set(max(lastTest.getDownloadSpeedBytes(), backup.getDownloadSpeedBytes()));
         gaugeUploadSpeed.get().set(max(lastTest.getUploadSpeedBytes(), backup.getUploadSpeedBytes()));
+        jitterTimer.get().record((int)(lastTest.getJitterMillis()*1000.0), TimeUnit.MICROSECONDS);
     }
 
     private void noMetrics() {

@@ -1,6 +1,7 @@
 spring:
   application:
     name: connectivitymonitor
+    performanceDropRateTreshold: 0.05
 
 management:
   endpoints:
