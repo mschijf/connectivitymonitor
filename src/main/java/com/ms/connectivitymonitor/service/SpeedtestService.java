@@ -137,7 +137,7 @@ public class SpeedtestService {
         };
         counterPerformanceDropped = new Lazy<>() {
             @Override
-            protected Counter init() {return meterRegistry.counter("speedTestPerforamceDropped");
+            protected Counter init() {return meterRegistry.counter("speedTestPerformanceDropped");
             }
         };
         jitterTimer = new Lazy<>() {
