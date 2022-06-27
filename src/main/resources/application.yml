@@ -1,7 +1,13 @@
 spring:
   application:
     name: connectivitymonitor
-    performanceDropRateTreshold: 0.05
+    speedtest:
+      performanceDropRateTreshold: 0.05
+      enabled: true
+    pingtest:
+      pingHost: jitter.com
+      enabled: false
+
 
 management:
   endpoints:

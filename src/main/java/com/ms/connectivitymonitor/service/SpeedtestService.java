@@ -30,6 +30,7 @@ public class SpeedtestService {
 
     private final OoklaSpeedTestExecutor ooklaSpeedTestExecutor;
     private final double performanceDropRateTreshold;
+    private final boolean enabled;
     private Lazy<AtomicInteger> gaugeDownloadSpeed;
     private Lazy<AtomicInteger> gaugeUploadSpeed;
 
@@ -42,15 +43,18 @@ public class SpeedtestService {
     @Autowired
     public SpeedtestService(OoklaSpeedTestExecutor ooklaSpeedTestExecutor, MeterRegistry meterRegistry, Environment env) {
         this.ooklaSpeedTestExecutor = ooklaSpeedTestExecutor;
-        this.performanceDropRateTreshold = Double.parseDouble(env.getProperty("spring.application.performanceDropRateTreshold"));
+        this.performanceDropRateTreshold = Double.parseDouble(env.getProperty("spring.application.speedtest.performanceDropRateTreshold"));
+        this.enabled = Boolean.parseBoolean(env.getProperty("spring.application.speedtest.enabled"));
         initMetrics(meterRegistry);
     }
 
     @Scheduled(cron = "${schedule.runspeedtest.cron:-}")
     private void scheduleFixedDelayTask() {
-        Instant start = Instant.now();
-        doSpeedTest();
-        log.debug("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis()/1000.0);
+        if (enabled) {
+            Instant start = Instant.now();
+            doSpeedTest();
+            log.debug("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis() / 1000.0);
+        }
     }
 
     public Optional<SpeedtestData> doSpeedTest() {

@@ -9,6 +9,7 @@ import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -23,21 +24,29 @@ public class PingService {
     private Lazy<Counter> counterPingPackagesMissed;
     private Lazy<Timer> pingTimer;
     private int countExecuted = 0;
+    private final String pingHost;
+    private final boolean enabled;
+
 
     @Autowired
-    public PingService(PingExecutor pingExecutor, MeterRegistry meterRegistry) {
+    public PingService(PingExecutor pingExecutor, MeterRegistry meterRegistry, Environment env) {
         this.pingExecutor = pingExecutor;
+        this.pingHost = env.getProperty("spring.application.pingtest.pingHost");
+        this.enabled = Boolean.parseBoolean(env.getProperty("spring.application.pingtest.enabled"));
+
         initMetrics(meterRegistry);
     }
 
     @Scheduled(fixedDelay = 500)
     private void scheduleFixedDelayTask() {
-        doPing();
+        if (enabled) {
+            doPing();
+        }
     }
 
     public Optional<PingData> doPing() {
         int numberOfPings = 1;
-        Optional<PingData> pingData = pingExecutor.execute("kpn.nl", numberOfPings, numberOfPings + 1);
+        Optional<PingData> pingData = pingExecutor.execute(pingHost, numberOfPings, numberOfPings + 1);
         pingData.ifPresentOrElse(this::setMetrics, ()->setMetricsWhenMissingData(numberOfPings));
 
         if (++countExecuted % 500 == 0) {
