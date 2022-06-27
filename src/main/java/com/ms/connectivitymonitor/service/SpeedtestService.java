@@ -37,6 +37,7 @@ public class SpeedtestService {
     private Lazy<Counter> counterRetryNecessary;
     private Lazy<Counter> counterPerformanceDropped;
     private Lazy<Timer> jitterTimer;
+    private Lazy<Timer> latencyTimer;
 
     private SpeedtestData lastSpeedtestResult = null;
 
@@ -150,12 +151,19 @@ public class SpeedtestService {
                 return Timer.builder("jittertime").register(meterRegistry);
             }
         };
+        latencyTimer = new Lazy<>() {
+            @Override
+            protected Timer init() {
+                return Timer.builder("latencytime").register(meterRegistry);
+            }
+        };
     }
 
     private void setMetrics(SpeedtestData lastTest, SpeedtestData backup) {
         gaugeDownloadSpeed.get().set(max(lastTest.getDownloadSpeedBytes(), backup.getDownloadSpeedBytes()));
         gaugeUploadSpeed.get().set(max(lastTest.getUploadSpeedBytes(), backup.getUploadSpeedBytes()));
         jitterTimer.get().record((int)(lastTest.getJitterMillis()*1000.0), TimeUnit.MICROSECONDS);
+        latencyTimer.get().record((int)(lastTest.getLatencyMillis()*1000.0), TimeUnit.MICROSECONDS);
     }
 
     private void noMetrics() {
