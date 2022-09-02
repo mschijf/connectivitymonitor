@@ -54,7 +54,7 @@ public class SpeedtestService {
         if (enabled) {
             Instant start = Instant.now();
             doSpeedTest();
-            log.debug("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis() / 1000.0);
+            log.info("Run scheduled job in {}", Duration.between(start, Instant.now()).toMillis() / 1000.0);
         }
     }
 
